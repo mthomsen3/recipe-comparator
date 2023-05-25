@@ -18,7 +18,7 @@
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 
 
-  <title>Mean Recipes</title>
+  <title>Recipe Comparator</title>
 
 </head>
 
@@ -39,7 +39,6 @@
     </nav>
   </header>
 
-
   <div class="flex flex-jc-c flex-ai-c">
     <div class="wrap">
       <div class="search">
@@ -54,289 +53,125 @@
   </div>
 
   <div class="hints">
-    <p id="search-hint"><i class="fa-solid fa-circle-info"></i>Not getting many results? Try adding the word "recipe" to the end of your query.</p>
-    <p id="search-hint"><i class="fa-solid fa-circle-info"></i>Click and drag to rearrange the indredient lists for side-by-side comparison.</p>
+    <p id="search-hint"><i class="fa-solid fa-circle-info"></i>Not getting many results? Try adding the word "recipe" to
+      the end of your query.</p>
+    <p id="search-hint"><i class="fa-solid fa-circle-info"></i>Click and drag to rearrange the indredient lists for
+      side-by-side comparison.</p>
   </div>
 
-    <% var rl1; var rl2; var rl3; %>
-    <% if(recipeData1 !==null && recipeData1 != undefined){rl1=recipeData1.recipeIngredient.length;} %>
-    <% if(recipeData2 !==null && recipeData2 != undefined){rl2=recipeData2.recipeIngredient.length;} %>
-    <% if(recipeData3 !==null && recipeData3 != undefined){rl3=recipeData3.recipeIngredient.length;} %>
-    <% var max = Math.max(rl1, rl2, rl3); %>
-
-
+  <% var rl=[]; %>
+  <% for(let i=0; i < 3; i++) { %>
+  <% if(recipeData[i] !==null && recipeData[i] !=undefined){rl[i]=recipeData[i].recipeIngredient.length;} %>
+  <% } %>
+  <% var max=Math.max(...rl); %>
 
   <div class="container">
+
     <div class="row title-cards flex flex-row flex-jc-c">
+      <% for(let i=0; i < 3; i++) { %>
       <div class="col card">
-        <% if(recipeData1==null || recipeData1 == undefined){ %>
-          <p class="card-text"> No properly formatted recipe detected. </p>
-          <% } %>
-            <% if(recipeData1 !==null && recipeData1 != undefined){ %>
-              <div class="card-body">
-                <h4 class="card-title"><a href="<%- recipeData1.url %>">
-                    <%- recipeData1.name %>
-                  </a></h5>
-                  <ul>
-                    <li><b>Prep Time:</b>
-                      <%- recipeData1.prepTime %>
-                    </li>
-                    <li><b>Cook Time:</b>
-                      <%- recipeData1.cookTime %>
-                    </li>
-                    <li><b>Total Time:</b>
-                      <%- recipeData1.totalTime %>
-                    </li>
-                    <li><b>Yield:</b>
-                      <%- recipeData1.recipeYield %>
-                    </li>
-                  </ul>
-              </div>
-              <% } %>
+        <% if(recipeData[i]==null || recipeData[i]==undefined){ %>
+        <p class="card-text"> No properly formatted recipe detected. </p>
+        <% } %>
+        <% if(recipeData[i] !==null && recipeData[i] !=undefined){ %>
+        <div class="card-body">
+          <h4 class="card-title">
+            <a href="<%- recipeData[i].url %>">
+              <%- recipeData[i].name %>
+            </a>
+          </h4>
+          <ul>
+            <li><b>Prep Time:</b> <%- recipeData[i].prepTime %></li>
+            <li><b>Cook Time:</b> <%- recipeData[i].cookTime %></li>
+            <li><b>Total Time:</b> <%- recipeData[i].totalTime %></li>
+            <li><b>Yield:</b> <%- recipeData[i].recipeYield %></li>
+          </ul>
+        </div>
+        <% } %>
       </div>
-
-
-      <div class="col card">
-        <% if(recipeData2==null || recipeData2 == undefined){ %>
-          <p class="card-text"> No properly formatted recipe detected. </p>
-          <% } %>
-            <% if(recipeData2 !==null && recipeData2 != undefined){ %>
-              <div class="card-body">
-                <h4 class="card-title"><a href="<%- recipeData2.url %>">
-                    <%- recipeData2.name %>
-                  </a></h5>
-                  <ul>
-                    <li><b>Prep Time:</b>
-                      <%- recipeData2.prepTime %>
-                    </li>
-                    <li><b>Cook Time:</b>
-                      <%- recipeData2.cookTime %>
-                    </li>
-                    <li><b>Total Time:</b>
-                      <%- recipeData2.totalTime %>
-                    </li>
-                    <li><b>Yield:</b>
-                      <%- recipeData2.recipeYield %>
-                    </li>
-                  </ul>
-              </div>
-              <% } %>
-      </div>
-
-
-
-      <div class="col card">
-        <% if(recipeData3==null || recipeData3 == undefined){ %>
-          <p class="card-text"> No properly formatted recipe detected. </p>
-          <% } %>
-            <% if(recipeData3 !==null && recipeData3 != undefined){ %>
-              <div class="card-body">
-                <h4 class="card-title"><a href="<%- recipeData3.url %>">
-                    <%- recipeData3.name %>
-                  </a></h5>
-                  <ul>
-                    <li><b>Prep Time:</b>
-                      <%- recipeData3.prepTime %>
-                    </li>
-                    <li><b>Cook Time:</b>
-                      <%- recipeData3.cookTime %>
-                    </li>
-                    <li><b>Total Time:</b>
-                      <%- recipeData3.totalTime %>
-                    </li>
-                    <li><b>Yield:</b>
-                      <%- recipeData3.recipeYield %>
-                    </li>
-                  </ul>
-              </div>
-              <% } %>
-      </div>
+      <% } %>
     </div>
 
     <div class="row ingredients flex flex-row flex-jc-c">
+      <% for(let i=0; i < 3; i++) { %>
       <div class="col">
-        <% if(recipeData1 !==null && recipeData1 != undefined){ %>
-          <div class="card">
-            <h4 class="card-title"> Ingredients </h4>
-            <ul id="list-one">
-              <%for (var ingredient in recipeData1.recipeIngredient){%>
-                <li>
-                  <%=recipeData1.recipeIngredient[ingredient]%>
-                </li>
-                <%}%>
-                <%x=0%>
-                <%while (x < (max-rl1)){%>
-                  <li>
-                    
-                  </li>
-                <%x++%>
-                <%}%>
-            </ul>
-          </div>
-          <% } %>
+        <% if(recipeData[i] !==null && recipeData[i] !=undefined){ %>
+        <div class="card">
+          <h4 class="card-title"> Ingredients </h4>
+          <ul id="list-<%= i + 1 %>">
+            <%for (var ingredient in recipeData[i].recipeIngredient){%>
+            <li>
+              <%=recipeData[i].recipeIngredient[ingredient]%>
+            </li>
+            <%}%>
+                              <%x=0%>
+            <%while (x < (max-rl[i])){%>
+            <li></li>
+            <%x++%>
+            <%}%>
+                        </ul>
+                      </div>
+                      <% } %>
+        </div>
+        <% } %>
       </div>
 
-      <div class="col">
-        <% if(recipeData2 !==null && recipeData2 != undefined){ %>
-          <div class="card">
-            <h4 class="card-title"> Ingredients </h4>
-            <ul id="list-two">
-              <%for (var ingredient in recipeData2.recipeIngredient){%>
-                <li>
-                  <%=recipeData2.recipeIngredient[ingredient]%>
-                </li>
-                <%}%>
-                <%x=0%>
-                <%while (x < (max-rl2)){%>
-                  <li>
-                    
-                  </li>
-                <%x++%>
-                <%}%>
-            </ul>
-          </div>
-          <% } %>
-      </div>
-
-      <div class="col">
-        <% if(recipeData3 !==null && recipeData3 != undefined){ %>
-          <div class="card">
-            <h4 class="card-title"> Ingredients </h4>
-            <ul id="list-three">
-              <%for (var ingredient in recipeData3.recipeIngredient){%>
-                <li>
-                  <%=recipeData3.recipeIngredient[ingredient]%>
-                </li>
-                <%}%>
-                <%x=0%>
-                <%while (x < (max-rl3)){%>
-                  <li>
-                    
-                  </li>
-                <%x++%>
-                <%}%>
-            </ul>
-          </div>
-          <% } %>
-      </div>
-    </div>
-
-    <div class="row description flex flex-row flex-jc-c">
-      <div class="col">
-        <% if(recipeData1 !==null && recipeData1 != undefined){ %>
+      <div class="row description flex flex-row flex-jc-c">
+        <% for(let i=0; i < 3; i++) { %>
+        <div class="col">
+          <% if(recipeData[i] !==null && recipeData[i] !=undefined){ %>
           <div class="card">
             <h4 class="card-title"> Description </h4>
             <p class="card-text">
-              <%- recipeData1.description %>
+              <%- recipeData[i].description %>
             </p>
             <div class="card-footer">
-              <small><a href="<%- recipeData1.url %>">Link to Original</a></small>
+              <small><a href="<%- recipeData[i].url %>">Link to Original</a></small>
             </div>
           </div>
           <% } %>
+        </div>
+        <% } %>
       </div>
 
-      <div class="col">
-        <% if(recipeData2 !==null && recipeData2 != undefined){ %>
-          <div class="card">
-            <h4 class="card-title"> Description </h4>
-            <p class="card-text">
-              <%- recipeData2.description %>
-            </p>
-            <div class="card-footer">
-              <small><a href="<%- recipeData2.url %>">Link to Original</a></small>
-            </div>
-          </div>
-          <% } %>
-      </div>
-
-
-      <div class="col">
-        <% if(recipeData3 !==null && recipeData3 != undefined){ %>
-          <div class="card">
-            <h4 class="card-title"> Description </h4>
-            <p class="card-text">
-              <%- recipeData3.description %>
-            </p>
-            <div class="card-footer">
-              <small><a href="<%- recipeData3.url %>">Link to Original</a></small>
-            </div>
-          </div>
-          <% } %>
-      </div>
-    </div>
-
-
-    <div class="row instructions flex flex-row flex-jc-c">
-      <div class="col">
-        <% if(recipeData1 !==null && recipeData1 != undefined){ %>
+      <div class="row instructions flex flex-row flex-jc-c">
+        <% for(let i=0; i < 3; i++) { %>
+        <div class="col">
+          <% if(recipeData[i] !==null && recipeData[i] !=undefined){ %>
           <div class="card">
             <h4 class="card-title"> Instructions </h4>
-            <ul id="list-one">
-              <%for (var instruction in recipeData1.recipeInstructions){%>
-                <li>
-                  <%=recipeData1.recipeInstructions[instruction]['text']%>
-                </li>
-                <%}%>
-            </ul>
+            <ul id="list-<%= i + 1 %>">
+              <%for (var instruction in recipeData[i].recipeInstructions){%>
+              <li>
+                <%=recipeData[i].recipeInstructions[instruction]['text']%>
+              </li>
+              <%}%>
+                        </ul>
+                      </div>
+                      <% } %>
           </div>
           <% } %>
+        </div>
+
       </div>
 
-      <div class="col">
-        <% if(recipeData2 !==null && recipeData2 != undefined){ %>
-          <div class="card">
-            <h4 class="card-title"> Instructions </h4>
-            <ul id="list-two">
-              <%for (var instruction in recipeData2.recipeInstructions){%>
-                <li>
-                  <%=recipeData2.recipeInstructions[instruction]['text']%>
-                </li>
-                <%}%>
-            </ul>
-          </div>
-          <% } %>
+      <div class="footer">
+
+        <div class="footer__links">
+
+          <a href="#">Privacy Policy</a>
+          <a href="#">Contact</a>
+          <a href="#">Terms of Service</a>
+        </div>
+
+        <div class="footer__copyright has-darkmode darkmode">
+          &copy; CS27 All Rights Reserved.
+        </div>
+
       </div>
-
-      <div class="col">
-        <% if(recipeData3 !==null  && recipeData3 != undefined){ %>
-          <div class="card">
-            <h4 class="card-title"> Instructions </h4>
-            <ul id="list-three">
-              <%for (var instruction in recipeData3.recipeInstructions){%>
-                <li>
-                  <%=recipeData3.recipeInstructions[instruction]['text']%>
-                </li>
-                <%}%>
-            </ul>
-          </div>
-          <% } %>
-      </div>
-    </div>
-
-    
-  </div>
-
-  <div class="footer">
-
-    <div class="footer__links">
-
-      <a href="#">Privacy Policy</a>
-      <a href="#">Contact</a>
-      <a href="#">Terms of Service</a>
-    </div>
-
-    <div class="footer__copyright has-darkmode darkmode">
-      &copy; CS27 All Rights Reserved.
-    </div>
-
-  </div>
 
 </body>
 
-
 <script src="js/list.js"></script>
-
-
 
 </html>

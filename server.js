@@ -19,7 +19,7 @@ app.listen(3000, function () {
 })
 
 app.get('/', function (req, res) {
-    res.render('index', { recipeData1: null, recipeData2: null, recipeData3: null, error: null });
+    res.render('index', { recipeData: [], error: null });
 
 });
 
@@ -38,154 +38,40 @@ app.post('/', function (req, res) {
     axios.get(googleSearchUrl).then(resp => {
         // later insert axios 200 response code check here
 
-        var searchResult1Url = resp.data.items[0].link;
-        var searchResult2Url = resp.data.items[1].link;
-        var searchResult3Url = resp.data.items[2].link;
-        var searchResult4Url = resp.data.items[3].link;
-        var searchResult5Url = resp.data.items[4].link;
-        var searchResult6Url = resp.data.items[5].link;
-        var searchResult7Url = resp.data.items[6].link;
-        var searchResult8Url = resp.data.items[7].link;
-        var searchResult9Url = resp.data.items[8].link;
-        var searchResult10Url = resp.data.items[9].link;
+       // Use a loop to get URLs and make requests
+        let searchResultUrls = resp.data.items.slice(0, numSearchResults).map(item => item.link);
+        let requests = searchResultUrls.map(url => axios.get(url));
 
-        Promise.allSettled([
-            axios.get(searchResult1Url),
-            axios.get(searchResult2Url),
-            axios.get(searchResult3Url),
-            axios.get(searchResult4Url),
-            axios.get(searchResult5Url),
-            axios.get(searchResult6Url),
-            axios.get(searchResult7Url),
-            axios.get(searchResult8Url),
-            axios.get(searchResult9Url),
-            axios.get(searchResult10Url)
-        ])
-            .then(axios.spread((res1, res2, res3, res4, res5, res6, res7, res8, res9, res10) => {
-
-                // NOTE - Promise.all will resolve to an array of each of the values that the Promises resolve to - eg [Promise.resolve(1), Promise.resolve(2)] will turn into [1, 2]. Promise.allSettled will instead give you [{ status : 'fulfilled', value: 1 }, { status : 'fulfilled', value: 2 }].
-                // so res#.value gets the return value, res.status gets the response
+        Promise.allSettled(requests)
+            .then(results => {
                 let recipeDisplay = [];
 
-                if (res1.status == "fulfilled") {
-                    if (checkForRecipeSchema(res1.value) == true) {
-                        res1data = scrapeRecipeData(res1.value);
-                        if(res1data != null && res1data != undefined)
-                        {
-                            recipeDisplay.push(res1data);
+                results.forEach(result => {
+                    if (result.status === "fulfilled" && checkForRecipeSchema(result.value)) {
+                        let recipeData = scrapeRecipeData(result.value);
+                        if(recipeData) {
+                            recipeDisplay.push(recipeData);
                         }
-                    } 
-                }
+                    }
+                });
 
-                if (res2.status == "fulfilled") {
-                    if (checkForRecipeSchema(res2.value) == true) {
-                        res2data = scrapeRecipeData(res2.value);
-                        if(res2data != null && res2data != undefined)
-                        {
-                            recipeDisplay.push(res2data);
-                        }
-                    } 
-                }
 
-                if (res3.status == "fulfilled") {
-                    if (checkForRecipeSchema(res3.value) == true) {
-                        res3data = scrapeRecipeData(res3.value);
-                        if(res3data != null && res3data != undefined)
-                        {
-                            recipeDisplay.push(res3data);
-                        }
-                    } 
+                while (recipeDisplay.length < 3) {
+                    recipeDisplay.push(null);
                 }
-
-                if (res4.status == "fulfilled") {
-                    if (checkForRecipeSchema(res4.value) == true) {
-                        res4data = scrapeRecipeData(res4.value);
-                        if(res4data != null && res4data != undefined)
-                        {
-                            recipeDisplay.push(res4data);
-                        }
-                    } 
-                }
-
-                if (res5.status == "fulfilled") {
-                    if (checkForRecipeSchema(res5.value) == true) {
-                        res5data = scrapeRecipeData(res5.value);
-                        if(res5data != null && res5data != undefined)
-                        {
-                            recipeDisplay.push(res5data);
-                        }
-                    } 
-                }
-
-                if (res6.status == "fulfilled") {
-                    if (checkForRecipeSchema(res6.value) == true) {
-                        res6data = scrapeRecipeData(res6.value);
-                        if(res6data != null && res6data != undefined)
-                        {
-                            recipeDisplay.push(res6data);
-                        }
-                    }  
-                }
-
-                if (res7.status == "fulfilled") {
-                    if (checkForRecipeSchema(res7.value) == true) {
-                        res7data = scrapeRecipeData(res7.value);
-                        if(res7data != null && res7data != undefined)
-                        {
-                            recipeDisplay.push(res7data);
-                        }
-                    } 
-                }
-
-                if (res8.status == "fulfilled") {
-                    if (checkForRecipeSchema(res8.value) == true) {
-                        res8data = scrapeRecipeData(res8.value);
-                        if(res8data != null && res8data != undefined)
-                        {
-                            recipeDisplay.push(res8data);
-                        }
-                    } 
-                }
-
-                if (res9.status == "fulfilled") {
-                    if (checkForRecipeSchema(res9.value) == true) {
-                        res9data = scrapeRecipeData(res9.value);
-                        if(res9data != null && res9data != undefined)
-                        {
-                            recipeDisplay.push(res9data);
-                        }
-                    } 
-                }
-
-                if (res10.status == "fulfilled") {
-                    if (checkForRecipeSchema(res10.value) == true) {
-                        res10data = scrapeRecipeData(res10.value);
-                        if(res10data != null && res10data != undefined)
-                        {
-                            recipeDisplay.push(res10data);
-                        }
-                    } 
-                }
-
+                
                 console.log("rendering");
-                console.log(recipeDisplay[0]);
-                console.log(recipeDisplay[1]);
-                console.log(recipeDisplay[2]);
                 res.render('index', {
-                    recipeData1: recipeDisplay[0],
-                    recipeData2: recipeDisplay[1],
-                    recipeData3: recipeDisplay[2],
+                    recipeData: recipeDisplay,
                     error: null
                 });
 
-            }))
+            })
             .catch(err => {
                 console.log(err);
                 console.log("didn't get 3 recipes");
                 res.render('index', {
-                    recipeData1: null,
-                    recipeData2: null,
-                    recipeData3: null,
+                    recipeData: [],
                     error: 'Failed to retrieve recipe data'
                 });
             });
@@ -193,9 +79,7 @@ app.post('/', function (req, res) {
     }).catch(err => {
         console.log(err);
         res.render('index', {
-            recipeData1: null,
-            recipeData2: null,
-            recipeData3: null,
+            recipeData:[],
             error: 'Error searching Google'
         });
     });
@@ -365,6 +249,8 @@ Number.prototype.toHHMMSS = function () {
     if (hours != 0) { return hours + ' Hours, ' + minutes + ' Minutes'; }
     else { return; }
 }
+
+
 
 function isValidUrl(string) {
     try {
