@@ -85,85 +85,53 @@ a {
 
 
 
-
-.ingredients {
-
-    ul {
-        list-style: none;
-        padding: 0;
-    }
-
-    li {
-        height: 4rem;
-        min-height: 4rem;
-        margin: 0.5rem;
-        padding-top: 0.1rem;
-        padding-right: 0.1rem;
-        padding-bottom: 0.1rem;
-        padding-left: 0.5rem;
-        background: $backwhite;
-        //border: 2px solid $watermelon;
-        border-radius: 0.25rem;
-        overflow: hidden;
-        display : flex;
-        align-items : center;
-        box-shadow: 0 0 3px $carbon;
-        transition: scale 200ms ease-in-out;
-
-
-        @include breakpoint-down(small) {
-            height: 5rem;
-            min-height: 5rem;
-        }
-
-        &:hover {
-            overflow: visible;
-            height: auto;
-            scale: 1.02;
-            cursor: grab;
-        }
-
-    }
-
+.ingredients ul, .instructions ul {
+    list-style: none;
+    padding: 0;
 }
 
+.ingredients li, .instructions li {
+    min-height: 4rem;
+    margin: 0.5rem;
+    padding-left: 0.5rem;
+    background: $backwhite;
+    border-radius: 0.25rem;
+    overflow: hidden;
+    display : flex;
+    align-items : center;
+    box-shadow: 0 0 3px $carbon;
 
-.instructions {
-
-    ul {
-        list-style: none;
-        padding: 0;
-    }
-
-    li {
+    &:hover {
+        overflow: visible;
         height: auto;
-        min-height: 4rem;
-        margin: 0.5rem;
-        padding-top: 0.7rem;
-        padding-right: 0.3rem;
-        padding-bottom: 0.7rem;
-        padding-left: 0.5rem;
-        background: $backwhite;
-        //border: 2px solid $watermelon;
-        border-radius: 0.25rem;
-        overflow: hidden;
-        display : flex;
-        align-items : center;
-        box-shadow: 0 0 3px $carbon;
+    }
+}
 
+.ingredients li {
+    height: 4rem;
+    padding: 0.1rem 0.1rem 0.1rem;
+    transition: scale 200ms ease-in-out;
 
-        @include breakpoint-down(small) {
-            min-height: 5rem;
-        }
-
-        &:hover {
-            overflow: visible;
-            height: auto;
-        }
-
+    @include breakpoint-down(small) {
+        height: 5rem;
+        min-height: 5rem;
     }
 
+    &:hover {
+        scale: 1.02;
+        cursor: grab;
+    }
 }
+
+.instructions li {
+    height: auto;
+    padding: 0.7rem 0.3rem 0.7rem;
+
+    @include breakpoint-down(small) {
+        min-height: 5rem;
+    }
+}
+
 
 
 

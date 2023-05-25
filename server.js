@@ -104,99 +104,86 @@ app.use(function (err, req, res, next) {
     res.render('error');
 });
 
-function nullifyPromiseErrors(promises) {
-    return Promise.all(
-        promises.map(p => p.catch(error => null))
-    )
-}
+
+
 
 function checkForRecipeSchema(resp) {
-
-    //console.log("checking");
-    const $ = cheerio.load(resp.data);
-    // get the schema section from html to parse
-    var obj = $("script[type='application/ld+json']");
-
-    var json_schema = []
-    var json_parsed = [];
-    var jsonRecipeSection = [];
-
-    // if there are no "script[type='application/ld+json']" objects found anywhere
-    if (obj[0] == undefined) {
-        return false;
-    }
-    if (obj[0].children.length == 0) {
-        return false;
-    }
-
-    // otherwise, scan through cheerio data "script[type='application/ld+json']" objects to find recipe section
-    for (var i = 0; i < obj.length; i++) {
-        json_schema = obj[i].children[0].data;
-        json_parsed = JSON.parse(json_schema);
-        jsonRecipeSection = getObjects(json_parsed, '@type', 'Recipe');
-        /*if (jsonRecipeSection.length === 0){
-            continue;
-        } else {
-            break;
-        }
-        */
-    }
-
-    if (jsonRecipeSection == undefined || jsonRecipeSection == null || jsonRecipeSection.length == 0) {
-        return false;
-    } else {
-        return true;
-    }
-
+    let jsonRecipeSection = findRecipeSection(resp);
+    return jsonRecipeSection.length > 0;
 }
 
-function scrapeRecipeData(resp) {
-
-    //console.log("scraping");
+function findRecipeSection(resp) {
     const $ = cheerio.load(resp.data);
-    // get the schema section from html to parse
     var obj = $("script[type='application/ld+json']");
-
-    var json_schema = []
-    var json_parsed = [];
     var jsonRecipeSection = [];
-
-    // scan through cheerio data to find recipe section
+  
     for (var i = 0; i < obj.length; i++) {
-        json_schema = obj[i].children[0].data;
-        json_parsed = JSON.parse(json_schema);
-        jsonRecipeSection = getObjects(json_parsed, '@type', 'Recipe');
-
+        try {
+            let json_schema = obj[i].children[0].data;
+            let json_parsed = JSON.parse(json_schema);
+            jsonRecipeSection = getObjects(json_parsed, '@type', 'Recipe');
+            
+            // break the loop if a recipe section is found
+            if(jsonRecipeSection.length > 0) {
+                break;
+            }
+        } catch (err) {
+            console.log("Error parsing JSON");
+        }
     }
 
-    // grab marked up data, convert ISO durations to formatted time
-    // add later: catch for empty values?
-    let url = `${resp.config.url}`;
-    let name = `${jsonRecipeSection[0].name}`;
-    let description = `${jsonRecipeSection[0].description}`;
-    let prepTime = `${parseDuration(jsonRecipeSection[0].prepTime)}`;
-    let cookTime = `${parseDuration(jsonRecipeSection[0].cookTime)}`;
-    let totalTime = `${parseDuration(jsonRecipeSection[0].totalTime)}`;
-    let recipeYield = `${jsonRecipeSection[0].recipeYield}`;
-    let recipeIngredient = jsonRecipeSection[0].recipeIngredient;
-    let recipeInstructions = jsonRecipeSection[0].recipeInstructions;
+    return jsonRecipeSection;
+}
 
-    // make a custom JSON object with transformed (time) values
+
+function scrapeRecipeData(resp) {
+    let jsonRecipeSection = findRecipeSection(resp);
+
+    if(jsonRecipeSection.length == 0) {
+        return null;
+    }
+
+    let recipe = jsonRecipeSection[0];
 
     let data = {
-        "url": url,
-        "name": name,
-        "description": description,
-        "prepTime": prepTime,
-        "cookTime": cookTime,
-        "totalTime": totalTime,
-        "recipeYield": recipeYield,
-        "recipeIngredient": recipeIngredient,
-        "recipeInstructions": recipeInstructions
+        url: resp.config.url,
+        name: recipe.name || '',
+        description: recipe.description || '',
+        prepTime: recipe.prepTime ? parseDuration(recipe.prepTime) : '',
+        cookTime: recipe.cookTime ? parseDuration(recipe.cookTime) : '',
+        totalTime: recipe.totalTime ? parseDuration(recipe.totalTime) : '',
+        recipeYield: recipe.recipeYield || '',
+        recipeIngredient: recipe.recipeIngredient ? formatRecipeData(recipe.recipeIngredient) : [],
+        recipeInstructions: recipe.recipeInstructions ? formatRecipeData(recipe.recipeInstructions) : []
     };
 
     return data;
 }
+
+function formatRecipeData(data) {
+    let formattedData = [];
+
+    data.forEach(element => {
+        // If the element is an object, we need to find a suitable string property to use
+        // We choose 'text' as it's a common property for both 'HowToStep' and 'HowToSection' types
+        if (typeof element === 'object') {
+            if (element.text) {
+                formattedData.push(element.text);
+            } else if (element.itemListElement) {
+                // If the element is a 'HowToSection', recursively format its 'itemListElement'
+                formattedData = formattedData.concat(formatRecipeData(element.itemListElement));
+            }
+        }
+        // If the element is a string, we can use it directly
+        else if (typeof element === 'string') {
+            formattedData.push(element);
+        }
+    });
+
+    return formattedData;
+}
+
+
 
 // return the JSON object that contains a defined key value pair
 // obj = json to search, key = key, val = value 

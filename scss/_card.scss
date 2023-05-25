@@ -1,6 +1,4 @@
-.card {
- 
-    
+.card { 
     &-text,
     &-footer{
         padding: 1rem;
@@ -22,10 +20,7 @@
             @include breakpoint-down(small) {
                 padding-left: 0.3rem;
             }
-
         }
-
-        
     }
 
     &-title{
@@ -34,11 +29,9 @@
 
         a{
             font-size: 1.3rem;
-
             @include breakpoint-down(medium) {
                 font-size: 1rem;
             }
-
 
             transition: all 300ms ease-in-out;
             &:hover{
@@ -50,6 +43,4 @@
 
     &-footer{
     }
-
-
 }
