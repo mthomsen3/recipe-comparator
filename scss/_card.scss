@@ -1,0 +1,55 @@
+.card {
+ 
+    
+    &-text,
+    &-footer{
+        padding: 1rem;
+        margin-bottom: 0;
+
+        @include breakpoint-down(medium) {
+            padding: 0.5rem;
+        }
+        @include breakpoint-down(small) {
+            padding: 0.1rem;
+        }
+    }
+
+    &-body{
+        
+        ul {
+            list-style: none;
+
+            @include breakpoint-down(small) {
+                padding-left: 0.3rem;
+            }
+
+        }
+
+        
+    }
+
+    &-title{
+
+        text-align: center;
+
+        a{
+            font-size: 1.3rem;
+
+            @include breakpoint-down(medium) {
+                font-size: 1rem;
+            }
+
+
+            transition: all 300ms ease-in-out;
+            &:hover{
+                text-shadow: 0 0 1px $darkBlue;
+            }
+        }
+        
+    }
+
+    &-footer{
+    }
+
+
+}

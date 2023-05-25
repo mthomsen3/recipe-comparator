@@ -1,0 +1,228 @@
+body {
+    background: $screengray;
+    margin: 0;
+    padding: 2rem;
+    height: 100vh;
+    color: $blackboard;
+    font-family: "Public Sans", sans-serif;
+    font-size: 1rem;
+
+    @include breakpoint-down(medium) {
+        font-size: 0.9rem;
+        padding: 1rem;
+    }
+
+    @include breakpoint-down(small) {
+        font-size: 0.7rem;
+        padding: 0;
+    }
+
+}
+
+a {
+    text-decoration: none;
+    color: $darkBlue;
+}
+
+#search-hint {}
+
+
+// Flexbox
+.flex {
+    display: flex;
+
+    &-jc-r {
+        justify-content: flex-end;
+    }
+
+    &-jc-sb {
+        justify-content: space-between;
+    }
+
+    &-jc-c {
+        justify-content: center;
+    }
+
+    &-ai-c {
+        align-items: center;
+    }
+
+    &-col {
+        flex-direction: column;
+    }
+
+    &-row {
+        flex-direction: row;
+    }
+}
+
+.container {
+
+    &-search {
+        padding: 5rem;
+    }
+
+}
+
+.row {}
+
+.col {
+    flex: 1;
+    margin: 0.5rem;
+    padding: 0.25rem;
+    background: $neutral;
+    //border: 2px solid $watermelon;
+    border-radius: 0.5rem;
+    box-shadow: 0 0 4px $carbon;
+
+}
+
+.title-cards {}
+
+.ingredients {}
+
+.description {}
+
+
+
+
+.ingredients {
+
+    ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    li {
+        height: 4rem;
+        min-height: 4rem;
+        margin: 0.5rem;
+        padding-top: 0.1rem;
+        padding-right: 0.1rem;
+        padding-bottom: 0.1rem;
+        padding-left: 0.5rem;
+        background: $backwhite;
+        //border: 2px solid $watermelon;
+        border-radius: 0.25rem;
+        overflow: hidden;
+        display : flex;
+        align-items : center;
+        box-shadow: 0 0 3px $carbon;
+        transition: scale 200ms ease-in-out;
+
+
+        @include breakpoint-down(small) {
+            height: 5rem;
+            min-height: 5rem;
+        }
+
+        &:hover {
+            overflow: visible;
+            height: auto;
+            scale: 1.02;
+            cursor: grab;
+        }
+
+    }
+
+}
+
+
+.instructions {
+
+    ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    li {
+        height: auto;
+        min-height: 4rem;
+        margin: 0.5rem;
+        padding-top: 0.7rem;
+        padding-right: 0.3rem;
+        padding-bottom: 0.7rem;
+        padding-left: 0.5rem;
+        background: $backwhite;
+        //border: 2px solid $watermelon;
+        border-radius: 0.25rem;
+        overflow: hidden;
+        display : flex;
+        align-items : center;
+        box-shadow: 0 0 3px $carbon;
+
+
+        @include breakpoint-down(small) {
+            min-height: 5rem;
+        }
+
+        &:hover {
+            overflow: visible;
+            height: auto;
+        }
+
+    }
+
+}
+
+
+
+.hints {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+
+    i {
+        padding-right: 0.5rem;
+    }
+
+}
+
+
+.search {
+    width: 100%;
+    position: relative;
+    display: flex;
+    padding-top: 0.7rem;
+}
+
+.searchTerm {
+    width: 100%;
+    border: 3px solid $blackboard;
+    border-right: none;
+    padding: 5px;
+    height: 20px;
+    border-radius: 5px 0 0 5px;
+    outline: none;
+    color: $carbon;
+}
+
+.searchTerm:focus {
+    color: $blackboard
+}
+
+.searchButton {
+    width: 40px;
+    height: 36px;
+    border: 1px solid $blackboard;
+    background: $blackboard;
+    text-align: center;
+    color: #fff;
+    border-radius: 0 5px 5px 0;
+    cursor: pointer;
+    font-size: 20px;
+}
+
+/*Resize the wrap to see the search bar change!*/
+.wrap {
+    margin-top: 1rem;
+
+    form {
+        display: flex;
+        min-width: 300px;
+        max-width: 50vw;
+    }
+}
+
+

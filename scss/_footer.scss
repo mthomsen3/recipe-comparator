@@ -1,0 +1,40 @@
+.footer {
+
+    position: relative;
+    height: 70px;
+    width: 100%;
+    text-align: center;
+    font-size: 0.7rem;
+    color: $carbon;
+    padding-top: 1rem;
+
+    &__social {
+        padding-top: 0.5rem;
+    }
+
+    &__links {
+        padding-top: 0.5rem;
+
+        a {
+            color: $carbon; 
+            padding-left: 0.1rem;
+            padding-right: 0.1rem;
+        }
+
+        &.darkmode {
+            a {
+                color: $blackboard;
+            }
+        }
+
+    }
+
+    &__copyright {
+        padding-top: 0.5rem;
+        &.darkmode {
+            color: $blackboard;
+        }
+    }
+
+
+}

@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" type="text/css" href="css/style.css">
+
+  <!-- Fonts -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Monoton&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@900&display=swap" rel="stylesheet">
+  <!-- Javascript -->
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+
+
+  <title>Mean Recipes</title>
+
+</head>
+
+<body>
+
+  <header class="header">
+    <div class="overlay has-fade"></div>
+    <nav class="flex flex-jc-sb flex-ai-c container">
+      <a href="/" class="header__logo">
+        <p>The Recipe Comparator</p>
+        <!-- <img src="images/logo.png" alt="Logo Image"> -->
+      </a>
+
+      <div class="header__links flex flex-jc-sb flex-ai-c">
+        <a href="#">Home</a>
+        <a href="#">About</a>
+      </div>
+    </nav>
+  </header>
+
+
+  <div class="flex flex-jc-c flex-ai-c">
+    <div class="wrap">
+      <div class="search">
+        <form action="/" method="post">
+          <input name="searchQuery" type="text" class="searchTerm" placeholder="What's cooking?" required>
+          <button type="submit" class="searchButton">
+        </form>
+        <i class="fa fa-search"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="hints">
+    <p id="search-hint"><i class="fa-solid fa-circle-info"></i>Not getting many results? Try adding the word "recipe" to the end of your query.</p>
+    <p id="search-hint"><i class="fa-solid fa-circle-info"></i>Click and drag to rearrange the indredient lists for side-by-side comparison.</p>
+  </div>
+
+    <% var rl1; var rl2; var rl3; %>
+    <% if(recipeData1 !==null && recipeData1 != undefined){rl1=recipeData1.recipeIngredient.length;} %>
+    <% if(recipeData2 !==null && recipeData2 != undefined){rl2=recipeData2.recipeIngredient.length;} %>
+    <% if(recipeData3 !==null && recipeData3 != undefined){rl3=recipeData3.recipeIngredient.length;} %>
+    <% var max = Math.max(rl1, rl2, rl3); %>
+
+
+
+  <div class="container">
+    <div class="row title-cards flex flex-row flex-jc-c">
+      <div class="col card">
+        <% if(recipeData1==null || recipeData1 == undefined){ %>
+          <p class="card-text"> No properly formatted recipe detected. </p>
+          <% } %>
+            <% if(recipeData1 !==null && recipeData1 != undefined){ %>
+              <div class="card-body">
+                <h4 class="card-title"><a href="<%- recipeData1.url %>">
+                    <%- recipeData1.name %>
+                  </a></h5>
+                  <ul>
+                    <li><b>Prep Time:</b>
+                      <%- recipeData1.prepTime %>
+                    </li>
+                    <li><b>Cook Time:</b>
+                      <%- recipeData1.cookTime %>
+                    </li>
+                    <li><b>Total Time:</b>
+                      <%- recipeData1.totalTime %>
+                    </li>
+                    <li><b>Yield:</b>
+                      <%- recipeData1.recipeYield %>
+                    </li>
+                  </ul>
+              </div>
+              <% } %>
+      </div>
+
+
+      <div class="col card">
+        <% if(recipeData2==null || recipeData2 == undefined){ %>
+          <p class="card-text"> No properly formatted recipe detected. </p>
+          <% } %>
+            <% if(recipeData2 !==null && recipeData2 != undefined){ %>
+              <div class="card-body">
+                <h4 class="card-title"><a href="<%- recipeData2.url %>">
+                    <%- recipeData2.name %>
+                  </a></h5>
+                  <ul>
+                    <li><b>Prep Time:</b>
+                      <%- recipeData2.prepTime %>
+                    </li>
+                    <li><b>Cook Time:</b>
+                      <%- recipeData2.cookTime %>
+                    </li>
+                    <li><b>Total Time:</b>
+                      <%- recipeData2.totalTime %>
+                    </li>
+                    <li><b>Yield:</b>
+                      <%- recipeData2.recipeYield %>
+                    </li>
+                  </ul>
+              </div>
+              <% } %>
+      </div>
+
+
+
+      <div class="col card">
+        <% if(recipeData3==null || recipeData3 == undefined){ %>
+          <p class="card-text"> No properly formatted recipe detected. </p>
+          <% } %>
+            <% if(recipeData3 !==null && recipeData3 != undefined){ %>
+              <div class="card-body">
+                <h4 class="card-title"><a href="<%- recipeData3.url %>">
+                    <%- recipeData3.name %>
+                  </a></h5>
+                  <ul>
+                    <li><b>Prep Time:</b>
+                      <%- recipeData3.prepTime %>
+                    </li>
+                    <li><b>Cook Time:</b>
+                      <%- recipeData3.cookTime %>
+                    </li>
+                    <li><b>Total Time:</b>
+                      <%- recipeData3.totalTime %>
+                    </li>
+                    <li><b>Yield:</b>
+                      <%- recipeData3.recipeYield %>
+                    </li>
+                  </ul>
+              </div>
+              <% } %>
+      </div>
+    </div>
+
+    <div class="row ingredients flex flex-row flex-jc-c">
+      <div class="col">
+        <% if(recipeData1 !==null && recipeData1 != undefined){ %>
+          <div class="card">
+            <h4 class="card-title"> Ingredients </h4>
+            <ul id="list-one">
+              <%for (var ingredient in recipeData1.recipeIngredient){%>
+                <li>
+                  <%=recipeData1.recipeIngredient[ingredient]%>
+                </li>
+                <%}%>
+                <%x=0%>
+                <%while (x < (max-rl1)){%>
+                  <li>
+                    
+                  </li>
+                <%x++%>
+                <%}%>
+            </ul>
+          </div>
+          <% } %>
+      </div>
+
+      <div class="col">
+        <% if(recipeData2 !==null && recipeData2 != undefined){ %>
+          <div class="card">
+            <h4 class="card-title"> Ingredients </h4>
+            <ul id="list-two">
+              <%for (var ingredient in recipeData2.recipeIngredient){%>
+                <li>
+                  <%=recipeData2.recipeIngredient[ingredient]%>
+                </li>
+                <%}%>
+                <%x=0%>
+                <%while (x < (max-rl2)){%>
+                  <li>
+                    
+                  </li>
+                <%x++%>
+                <%}%>
+            </ul>
+          </div>
+          <% } %>
+      </div>
+
+      <div class="col">
+        <% if(recipeData3 !==null && recipeData3 != undefined){ %>
+          <div class="card">
+            <h4 class="card-title"> Ingredients </h4>
+            <ul id="list-three">
+              <%for (var ingredient in recipeData3.recipeIngredient){%>
+                <li>
+                  <%=recipeData3.recipeIngredient[ingredient]%>
+                </li>
+                <%}%>
+                <%x=0%>
+                <%while (x < (max-rl3)){%>
+                  <li>
+                    
+                  </li>
+                <%x++%>
+                <%}%>
+            </ul>
+          </div>
+          <% } %>
+      </div>
+    </div>
+
+    <div class="row description flex flex-row flex-jc-c">
+      <div class="col">
+        <% if(recipeData1 !==null && recipeData1 != undefined){ %>
+          <div class="card">
+            <h4 class="card-title"> Description </h4>
+            <p class="card-text">
+              <%- recipeData1.description %>
+            </p>
+            <div class="card-footer">
+              <small><a href="<%- recipeData1.url %>">Link to Original</a></small>
+            </div>
+          </div>
+          <% } %>
+      </div>
+
+      <div class="col">
+        <% if(recipeData2 !==null && recipeData2 != undefined){ %>
+          <div class="card">
+            <h4 class="card-title"> Description </h4>
+            <p class="card-text">
+              <%- recipeData2.description %>
+            </p>
+            <div class="card-footer">
+              <small><a href="<%- recipeData2.url %>">Link to Original</a></small>
+            </div>
+          </div>
+          <% } %>
+      </div>
+
+
+      <div class="col">
+        <% if(recipeData3 !==null && recipeData3 != undefined){ %>
+          <div class="card">
+            <h4 class="card-title"> Description </h4>
+            <p class="card-text">
+              <%- recipeData3.description %>
+            </p>
+            <div class="card-footer">
+              <small><a href="<%- recipeData3.url %>">Link to Original</a></small>
+            </div>
+          </div>
+          <% } %>
+      </div>
+    </div>
+
+
+    <div class="row instructions flex flex-row flex-jc-c">
+      <div class="col">
+        <% if(recipeData1 !==null && recipeData1 != undefined){ %>
+          <div class="card">
+            <h4 class="card-title"> Instructions </h4>
+            <ul id="list-one">
+              <%for (var instruction in recipeData1.recipeInstructions){%>
+                <li>
+                  <%=recipeData1.recipeInstructions[instruction]['text']%>
+                </li>
+                <%}%>
+            </ul>
+          </div>
+          <% } %>
+      </div>
+
+      <div class="col">
+        <% if(recipeData2 !==null && recipeData2 != undefined){ %>
+          <div class="card">
+            <h4 class="card-title"> Instructions </h4>
+            <ul id="list-two">
+              <%for (var instruction in recipeData2.recipeInstructions){%>
+                <li>
+                  <%=recipeData2.recipeInstructions[instruction]['text']%>
+                </li>
+                <%}%>
+            </ul>
+          </div>
+          <% } %>
+      </div>
+
+      <div class="col">
+        <% if(recipeData3 !==null  && recipeData3 != undefined){ %>
+          <div class="card">
+            <h4 class="card-title"> Instructions </h4>
+            <ul id="list-three">
+              <%for (var instruction in recipeData3.recipeInstructions){%>
+                <li>
+                  <%=recipeData3.recipeInstructions[instruction]['text']%>
+                </li>
+                <%}%>
+            </ul>
+          </div>
+          <% } %>
+      </div>
+    </div>
+
+    
+  </div>
+
+  <div class="footer">
+
+    <div class="footer__links">
+
+      <a href="#">Privacy Policy</a>
+      <a href="#">Contact</a>
+      <a href="#">Terms of Service</a>
+    </div>
+
+    <div class="footer__copyright has-darkmode darkmode">
+      &copy; CS27 All Rights Reserved.
+    </div>
+
+  </div>
+
+</body>
+
+
+<script src="js/list.js"></script>
+
+
+
+</html>

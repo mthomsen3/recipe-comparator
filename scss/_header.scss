@@ -1,0 +1,70 @@
+.header {
+    right: 0;
+    left: 0;
+    top: 0;
+
+    nav {
+        position: relative;
+        //max-width: 1024px;
+        margin: auto;
+        height: auto;
+
+        @include breakpoint-down(small) {
+            flex-direction: column;
+            justify-content: center;
+        }
+
+    }
+
+    &__logo {
+
+        text-decoration: none;
+
+
+        p {
+            //font-family: 'Monoton', cursive;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            text-align: center;
+            font-family: 'Rubik', sans-serif;
+            font-size: 2rem;
+            padding: 0 1.5rem;
+            color: $blackboard;
+            transition: color 500ms ease-in-out, text-shadow 500ms ease-in-out;
+
+            &:hover {
+                color: rgb(255, 183, 49);
+                text-shadow: 0 0 2px white;
+            }
+        }
+
+    }
+
+
+    &__links {
+        //padding: 0 1.5rem;
+        padding-top: 0.5rem;
+
+        @include breakpoint-down(small) {
+            text-align: center;
+        }
+
+        a {
+            padding-right: 1rem;
+            text-decoration: none;
+            position: relative;
+            color: $blackboard;
+            transition: color 500ms ease-in-out, text-shadow 500ms ease-in-out;
+
+
+            &:hover {
+                color: rgb(255, 183, 49);
+                text-shadow: 0 0 2px white;
+            }
+        }
+
+    }
+
+}
+
+
