@@ -4,15 +4,19 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const bodyParser = require('body-parser');
 const moment = require('moment');
-
 const app = express()
 
 // view engine setup
 app.set('views', 'views');
 app.set('view engine', 'ejs')
-
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: true }));
+
+// Validation of environment variables
+if (!process.env.apiKey || !process.env.searchEngineID) {
+    console.error("Missing required environment variables: apiKey, searchEngineID");
+    process.exit(1);
+}
 
 app.listen(3000, function () {
     console.log('App listening on port 3000.')
@@ -20,71 +24,36 @@ app.listen(3000, function () {
 
 app.get('/', function (req, res) {
     res.render('index', { recipeData: [], error: null });
-
 });
 
-app.post('/', function (req, res) {
-
-    let query = `${req.body.searchQuery}`;
-    let apiKey = process.env.apiKey
-    let searchEngineID = process.env.searchEngineID;
-    let numSearchResults = 10;
-
-    // compose google search URL
-    let googleSearchUrl = 'https://www.googleapis.com/customsearch/v1?key=' + apiKey + '&cx=' + searchEngineID + '&q=' + query + '&num=' + numSearchResults;
-
-    console.log(googleSearchUrl);
-
-    axios.get(googleSearchUrl).then(resp => {
-        // later insert axios 200 response code check here
-
-       // Use a loop to get URLs and make requests
-        let searchResultUrls = resp.data.items.slice(0, numSearchResults).map(item => item.link);
-        let requests = searchResultUrls.map(url => axios.get(url));
-
-        Promise.allSettled(requests)
-            .then(results => {
-                let recipeDisplay = [];
-
-                results.forEach(result => {
-                    if (result.status === "fulfilled" && checkForRecipeSchema(result.value)) {
-                        let recipeData = scrapeRecipeData(result.value);
-                        if(recipeData) {
-                            recipeDisplay.push(recipeData);
-                        }
-                    }
-                });
-
-
-                while (recipeDisplay.length < 3) {
-                    recipeDisplay.push(null);
-                }
-                
-                console.log("rendering");
-                res.render('index', {
-                    recipeData: recipeDisplay,
-                    error: null
-                });
-
-            })
-            .catch(err => {
-                console.log(err);
-                console.log("didn't get 3 recipes");
-                res.render('index', {
-                    recipeData: [],
-                    error: 'Failed to retrieve recipe data'
-                });
+app.post('/', async function (req, res, next) {
+    try {
+        let query = req.body.searchQuery;
+        validateInput(query);
+        
+        let searchResultUrls = await getSearchResults(query);
+        
+        let recipeDisplay;
+        try {
+            recipeDisplay = await getRecipes(searchResultUrls);
+        } catch(err) {
+            console.log(err);
+            res.render('index', {
+                recipeData: [],
+                error: 'Failed to retrieve recipe data'
             });
-            
-    }).catch(err => {
-        console.log(err);
+            return;
+        }
+        
         res.render('index', {
-            recipeData:[],
-            error: 'Error searching Google'
+            recipeData: recipeDisplay,
+            error: null
         });
-    });
-
+    } catch (err) {
+        next(err);
+    }
 });
+
 
 
 // catch 404 and forward to error handler
@@ -93,18 +62,81 @@ app.use(function (req, res, next) {
 });
 
 // error handler
-app.use(function (err, req, res, next) {
-    // set locals, only providing error in development
-    /* res.locals.message = err.message;
-    res.locals.error = req.app.get('env') === 'development' ? err : {}; */
-
-    // render the error page
-    res.status(err.status || 500);
-    console.log(err);
-    res.render('error');
+app.use(function(err, req, res, next) {
+    // Log the error, for now just console.log
+    console.error(err);
+    res.status(500).render('error', {
+        message: 'Internal Server Error'
+    });
 });
 
 
+async function getSearchResults(query) {
+    try {
+        let googleSearchUrl = `https://www.googleapis.com/customsearch/v1?key=${process.env.apiKey}&cx=${process.env.searchEngineID}&q=${query}&num=10`;
+
+        let resp = await axios.get(googleSearchUrl);
+        return resp.data.items.slice(0, 10).map(item => item.link);
+    } catch (err) {
+        throw new Error('Error searching Google');
+    }
+}
+
+async function getRecipes(searchResultUrls) {
+    let requests = searchResultUrls.map(url => axios.get(url));
+    let results = await Promise.allSettled(requests);
+    
+    let recipeDisplay = [];
+    let hasSuccessfulRequest = false;
+    let hasRecipe = false;
+
+    results.forEach((result, i) => {
+        try {
+            if (result.status === "fulfilled") {
+                hasSuccessfulRequest = true;
+                if (checkForRecipeSchema(result.value)) {
+                    let recipeData = scrapeRecipeData(result.value);
+                    if(recipeData) {
+                        recipeDisplay.push(recipeData);
+                        hasRecipe = true;
+                    } else {
+                        console.log(`Scrape failed for URL ${searchResultUrls[i]}`);
+                    }
+                } else {
+                    console.log(`No recipe schema for URL ${searchResultUrls[i]}`);
+                }
+            } else {
+                console.log(`Request failed for URL ${searchResultUrls[i]}`);
+            }
+        } catch (err) {
+            console.error(`Error processing URL ${searchResultUrls[i]}: ${err.message}`);
+        }
+    });
+
+    if (!hasSuccessfulRequest) {
+        throw new Error('No successful requests');
+    }
+
+    if (!hasRecipe) {
+        throw new Error('No recipes found');
+    }
+
+    while (recipeDisplay.length < 3) {
+        recipeDisplay.push(null);
+    }
+
+    return recipeDisplay;
+}
+
+
+
+
+function validateInput(query) {
+    // Add input validation and sanitization logic here
+    if (!query) {
+        throw new Error("Invalid search query");
+    }
+}
 
 
 function checkForRecipeSchema(resp) {

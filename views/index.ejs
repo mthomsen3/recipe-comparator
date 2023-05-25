@@ -140,7 +140,7 @@
           <% if(recipeData[i] !==null && recipeData[i] !=undefined){ %>
           <div class="card">
             <h4 class="card-title"> Instructions </h4>
-            <ul id="list-<%= i + 1 %>">
+            <ul>
               <%for (var instruction in recipeData[i].recipeInstructions){%>
               <li>
                 <%=recipeData[i].recipeInstructions[instruction]%>
