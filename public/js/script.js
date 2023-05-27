@@ -71,6 +71,4 @@ window.addEventListener('load', function () {
     // Set the selected value of the dropdown
     numResultsSelect.value = initialNumResults.toString();
 
-
-
 });
