@@ -22,7 +22,7 @@ body {
 
 a {
   text-decoration: none;
-  color: hsl(233deg, 27%, 57%);
+  color: hsl(233, 27%, 57%);
 }
 
 .flex {
@@ -90,7 +90,6 @@ a {
   overflow: visible;
   height: auto;
   scale: 1.02;
-  cursor: -webkit-grab;
   cursor: grab;
 }
 
@@ -121,6 +120,16 @@ a {
 .instructions li:hover {
   overflow: visible;
   height: auto;
+}
+
+.ingredients li.empty,
+.instructions li.empty {
+  background: rgba(252, 252, 252, 0.5);
+  cursor: default;
+}
+.ingredients li.empty:hover,
+.instructions li.empty:hover {
+  scale: 1;
 }
 
 .hints {
@@ -265,7 +274,7 @@ a {
   }
 }
 .card-title a:hover {
-  text-shadow: 0 0 1px hsl(233deg, 27%, 57%);
+  text-shadow: 0 0 1px hsl(233, 27%, 57%);
 }
 .footer {
   position: relative;

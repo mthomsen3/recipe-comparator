@@ -29,8 +29,9 @@ app.get('/', function (req, res) {
 app.post('/', async function (req, res, next) {
     try {
         let query = req.body.searchQuery;
+
         validateInput(query);
-        
+
         let searchResultUrls = await getSearchResults(query);
         
         let recipeDisplay;
@@ -55,7 +56,6 @@ app.post('/', async function (req, res, next) {
 });
 
 
-
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
     //next(createError(404));
@@ -70,7 +70,6 @@ app.use(function(err, req, res, next) {
     });
 });
 
-
 async function getSearchResults(query) {
     try {
         let googleSearchUrl = `https://www.googleapis.com/customsearch/v1?key=${process.env.apiKey}&cx=${process.env.searchEngineID}&q=${query}&num=10`;
@@ -83,50 +82,35 @@ async function getSearchResults(query) {
 }
 
 async function getRecipes(searchResultUrls) {
-    let requests = searchResultUrls.map(url => axios.get(url));
-    let results = await Promise.allSettled(requests);
-    
     let recipeDisplay = [];
-    let hasSuccessfulRequest = false;
-    let hasRecipe = false;
 
-    results.forEach((result, i) => {
+    for (let url of searchResultUrls) {
+        
         try {
-            if (result.status === "fulfilled") {
-                hasSuccessfulRequest = true;
-                if (checkForRecipeSchema(result.value)) {
-                    let recipeData = scrapeRecipeData(result.value);
-                    if(recipeData) {
-                        recipeDisplay.push(recipeData);
-                        hasRecipe = true;
-                    } else {
-                        console.log(`Scrape failed for URL ${searchResultUrls[i]}`);
-                    }
+            let response = await axios.get(url);
+            
+            if (checkForRecipeSchema(response)) {
+                let recipeData = scrapeRecipeData(response);
+                if(recipeData) {
+                    recipeDisplay.push(recipeData);
                 } else {
-                    console.log(`No recipe schema for URL ${searchResultUrls[i]}`);
+                    console.log(`Scrape failed for URL ${url}`);
                 }
             } else {
-                console.log(`Request failed for URL ${searchResultUrls[i]}`);
+                console.log(`No recipe schema for URL ${url}`);
             }
         } catch (err) {
-            console.error(`Error processing URL ${searchResultUrls[i]}: ${err.message}`);
+            console.log(`Request failed for URL ${url}`);
         }
-    });
-
-    if (!hasSuccessfulRequest) {
-        throw new Error('No successful requests');
     }
 
-    if (!hasRecipe) {
+    if (recipeDisplay.length === 0) {
         throw new Error('No recipes found');
-    }
-
-    while (recipeDisplay.length < 3) {
-        recipeDisplay.push(null);
     }
 
     return recipeDisplay;
 }
+
 
 
 
@@ -216,7 +200,6 @@ function formatRecipeData(data) {
 }
 
 
-
 // return the JSON object that contains a defined key value pair
 // obj = json to search, key = key, val = value 
 function getObjects(obj, key, val) {
@@ -255,11 +238,6 @@ Number.prototype.toHHMMSS = function () {
     seconds -= hours * 3600;
     var minutes = Math.floor(seconds / 60);
     seconds -= minutes * 60;
-
-    // this code just fills in leading zeroes, don't need it
-    /* if (hours   < 10) {hours   = "0"+hours;} */
-    /* if (minutes < 10) {minutes = "0"+minutes;} */
-    /* if (seconds < 10) {seconds = "0"+seconds;} */
 
     if (hours == 0) { return minutes + ' Minutes'; }
     if ((hours == 1) && (minutes == 0)) { return hours + ' Hour' }
