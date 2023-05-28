@@ -1,57 +1,28 @@
+// Declare numRecipes, numResultsSelect, prevButton, nextButton and firstVisibleCard at the top of the script
+var numRecipes, numResultsSelect, prevButton, nextButton, firstVisibleCard;
+
 window.addEventListener('load', function () {
-    var numResultsSelect = document.getElementById('numResultsSelect');
+    numResultsSelect = document.getElementById('numResultsSelect');
+    prevButton = document.getElementById('desktop-carousel-left');
+    nextButton = document.getElementById('desktop-carousel-right');
+    firstVisibleCard = 0;  // This will keep track of the first visible card
 
     numResultsSelect.addEventListener('change', function () {
-        var numResults = parseInt(this.value);
-
-        updateCards(numResults);
+        updateCards();
     });
 
-    // Function to update the visibility of the cards
-    function updateCards(numResults) {
-        const sections = ['title-cards', 'ingredients', 'description', 'instructions'];
+    prevButton.addEventListener('click', function () {
+        firstVisibleCard = Math.max(firstVisibleCard - 1, 0);  // Decrease the index of the first visible card by 1
+        updateCards();
+    });
 
-        for (let i = 0; i < 10; i++) {
-            sections.forEach(section => {
-                var card = document.getElementById(section + '-' + i);
-                if (card) {
-                    card.style.display = (i < numResults) ? 'block' : 'none';
-                }
-            });
-        }
-
-        // Initialize Sortable for ingredients lists and find the longest list
-        var maxLength = 0;
-        for (let i = 0; i < numResults; i++) {
-            let list = document.getElementById("list-" + (i + 1));
-            if (list) {
-                new Sortable(list, {
-                    animation: 200
-                });
-                maxLength = Math.max(maxLength, list.children.length);
-            }
-        }
-
-        // Add empty <li> elements to each list up to the length of the longest list
-        for (let i = 0; i < numResults; i++) {
-            let list = document.getElementById("list-" + (i + 1));
-            if (list) {
-                Array.from(list.getElementsByClassName("empty")).forEach(element => element.remove());
-                while (list.children.length < maxLength) {
-                    let li = document.createElement("li");
-                    li.className = "empty";
-                    list.appendChild(li);
-                }
-            }
-        }
-    }
-
-    // We'll use this to dynamically populate the number of results dropdown
-    var numResultsFound = document.getElementById('num-results-found');
+    nextButton.addEventListener('click', function () {
+        firstVisibleCard = Math.min(firstVisibleCard + 1, numRecipes - parseInt(numResultsSelect.value));  // Increase the index of the first visible card by 1, but not beyond the index of the last set of visible cards
+        updateCards();
+    });
 
     // How many recipes do we have?
-    var numRecipes = parseInt(document.getElementById('numRecipes').value);
-    numResultsFound.innerText = numRecipes;
+    numRecipes = parseInt(document.getElementById('numRecipes').value);
 
     // Populate the select menu
     for (let i = 1; i <= numRecipes; i++) {
@@ -64,11 +35,91 @@ window.addEventListener('load', function () {
     // Show the select menu
     document.getElementById('num-results-menu').style.display = 'block';
 
-    // Manually trigger the change event to initialize the page correctly
-    var initialNumResults = Math.min(3, numRecipes);
-    updateCards(initialNumResults);
-
     // Set the selected value of the dropdown
-    numResultsSelect.value = initialNumResults.toString();
+    numResultsSelect.value = Math.min(3, numRecipes).toString();
 
+    // Manually trigger the change event to initialize the page correctly
+    updateCards();
 });
+
+// Function to enable/disable the buttons based on the firstVisibleCard index
+function updateButtons() {
+    prevButton.disabled = (firstVisibleCard === 0);
+    nextButton.disabled = (firstVisibleCard + parseInt(numResultsSelect.value) >= numRecipes);
+}
+
+// Array to store Sortable instances
+let sortableInstances = [];
+function updateCards() {
+    var numResults = parseInt(numResultsSelect.value);
+    const sections = ['title-cards', 'ingredients', 'description', 'instructions'];
+
+    // Create or update Sortable instances
+    for (let i = 0; i < numRecipes; i++) {
+        // If there is a Sortable instance for this list, destroy it
+        if (sortableInstances[i]) {
+            sortableInstances[i].destroy();
+            sortableInstances[i] = null;
+        }
+
+        // Create a new Sortable instance for this list
+        let list = document.getElementById("list-" + (i + 1));
+        if (list) {
+            sortableInstances[i] = new Sortable(list, {
+                animation: 200
+            });
+        }
+    }
+
+    // Remove trailing empty <li> elements
+    for (let i = 0; i < numRecipes; i++) {
+        let list = document.getElementById("list-" + (i + 1));
+        if (list) {
+            let elements = list.children;
+            for (let j = elements.length - 1; j >= 0; j--) {
+                if (elements[j].className === "empty") {
+                    elements[j].parentNode.removeChild(elements[j]);
+                } else {
+                    // Stop at the first non-empty element
+                    break;
+                }
+            }
+        }
+    }
+
+
+    for (let i = 0; i < numRecipes; i++) {
+        sections.forEach(section => {
+            var card = document.getElementById(section + '-' + i);
+            if (card) {
+                card.style.display = (i >= firstVisibleCard && i < firstVisibleCard + numResults) ? 'block' : 'none';
+            }
+        });
+
+        // Find the longest list among visible lists
+        var maxLength = 0;
+        for (let i = firstVisibleCard; i < firstVisibleCard + numResults; i++) {
+            let list = document.getElementById("list-" + (i + 1));
+            if (list) {
+                maxLength = Math.max(maxLength, list.children.length);
+            }
+        }
+
+        // Add empty <li> elements to each visible list up to the length of the longest list
+        for (let i = firstVisibleCard; i < firstVisibleCard + numResults; i++) {
+            let list = document.getElementById("list-" + (i + 1));
+            if (list) {
+                while (list.children.length < maxLength) {
+                    let li = document.createElement("li");
+                    li.className = "empty";
+                    list.appendChild(li);
+                }
+            }
+        }
+    }
+
+    updateButtons();
+
+    // Update the number of results found
+    document.getElementById('num-results-found').innerText = numRecipes;
+}

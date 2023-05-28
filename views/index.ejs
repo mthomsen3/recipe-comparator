@@ -58,7 +58,7 @@
       <div id="num-results-menu" style="display: none;">
         <p id="resultsText">Found <span id="num-results-found"></span> recipes. </p>
         <p id="dropdown">
-          Select the number to compare here:
+          Select the number to display here:
           <select id="numResultsSelect" name="numberOfResults" class="selectNumber">
           </select>
         </p>
@@ -67,12 +67,6 @@
   </div>
 
 
-  <div class="hints">
-    <p id="search-hint"><i class="fa-solid fa-circle-info"></i>Not getting many results? Try adding the word "recipe" to
-      the end of your query.</p>
-    <p id="search-hint"><i class="fa-solid fa-circle-info"></i>Click and drag to rearrange the indredient lists for
-      side-by-side comparison.</p>
-  </div>
 
   <% var rl=[]; %>
     <% for(let i=0; i < 3; i++) { %>
@@ -80,41 +74,36 @@
         <% } %>
           <% var max=Math.max(...rl); %>
             <input type="hidden" id="numRecipes" value="<%= recipeData.length %>">
+            <div class="flex flex-jc-c flex-ai-c" id="desktop-carousel-controls">
+              <button id="desktop-carousel-left" disabled><img src="images/left-arrow.svg" alt="left arrow"></button>
+              <button id="desktop-carousel-right" disabled><img src="images/right-arrow.svg" alt="right arrow"></button>
+            </div>
 
             <div id="desktop-cards">
               <div class="container">
 
                 <div class="row title-cards flex flex-row flex-jc-c">
-                  <% if (recipeData.length==0) { %>
-                    <div class="card">
-                      <div class="card-body">
-                        <h4 class="card-title">Instructions</h4>
-                        <p class="card-text">Enter a search term and select the number of results to display to compare
-                          recipes.</p>
-                      </div>
-                    </div>
-                    <% } else { %>
-                      <% recipeData.forEach((recipe, i)=> { %>
-                        <div class="col card" id="title-cards-<%= i %>">
-                          <% if(recipe !==null && recipe !=undefined){ %>
-                            <div class="card-body">
-                              <h4 class="card-title">
-                                <a href="<%- recipe.url %>">
-                                  <%- recipe.name %>
-                                </a>
-                              </h4>
-                              <ul>
-                                <li><b>Prep Time:</b> <%- recipe.prepTime %></li>
-                                <li><b>Cook Time:</b> <%- recipe.cookTime %></li>
-                                <li><b>Total Time:</b> <%- recipe.totalTime %></li>
-                                <li><b>Yield:</b> <%- recipe.recipeYield %></li>
-                              </ul>
-                            </div>
-                            <% } %>
+                  <% recipeData.forEach((recipe, i)=> { %>
+                    <% if(recipe !==null && recipe !=undefined){ %>
+                      <div class="col card" id="title-cards-<%= i %>">
+                        <div class="card-body">
+                          <h4 class="card-title">
+                            <a href="<%- recipe.url %>">
+                              <%- recipe.name %>
+                            </a>
+                          </h4>
+                          <ul>
+                            <li><b>Prep Time:</b> <%- recipe.prepTime %></li>
+                            <li><b>Cook Time:</b> <%- recipe.cookTime %></li>
+                            <li><b>Total Time:</b> <%- recipe.totalTime %></li>
+                            <li><b>Yield:</b> <%- recipe.recipeYield %></li>
+                          </ul>
                         </div>
+                      </div>
+                      <% } %>
                         <% }); %>
-                          <% } %>
                 </div>
+
 
                 <div class="row ingredients flex flex-row flex-jc-c">
                   <% recipeData.forEach((recipe, i)=> { %>
@@ -175,10 +164,19 @@
               </div>
             </div>
             <!-- Carousel controls -->
-            <div id="carousel-controls">
+            <div id="mobile-carousel-controls">
               <button id="carousel-left">
                 <img src="images/left-arrow.svg" alt="left arrow">
               </button>
+              <div id="carousel-size-controls">
+                <button id="carousel-size-1" class="carousel-size-button">
+                  <img src="images/single.svg" alt="show 1">
+                </button>
+                <button id="carousel-size-2" class="carousel-size-button">
+                  <img src="images/double.svg" alt="show 2">
+                </button>
+              </div>
+
               <button id="carousel-right">
                 <img src="images/right-arrow.svg" alt="right arrow">
               </button>
@@ -258,7 +256,14 @@
               </div>
             </div>
 
-
+            <div class="hints">
+              <p id="search-hint"><i class="fa-solid fa-circle-info"></i>Not getting many results? Try adding the word
+                "recipe" to
+                the end of your query.</p>
+              <p id="search-hint"><i class="fa-solid fa-circle-info"></i>Click and drag to rearrange the indredient
+                lists for
+                side-by-side comparison.</p>
+            </div>
             <div class="footer">
 
               <div class="footer__links">

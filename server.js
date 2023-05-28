@@ -5,6 +5,10 @@ const cheerio = require('cheerio');
 const bodyParser = require('body-parser');
 const moment = require('moment');
 const app = express()
+const he = require('he');
+const striptags = require('striptags');
+const validator = require('validator');
+
 
 // view engine setup
 app.set('views', 'views');
@@ -116,11 +120,21 @@ async function getRecipes(searchResultUrls) {
 
 
 function validateInput(query) {
-    // Add input validation and sanitization logic here
     if (!query) {
         throw new Error("Invalid search query");
     }
+    let sanitizedQuery = validator.escape(query);
+    let alphanumericQuery = sanitizedQuery.replace(/ /g, '');
+    // also allowing commas and apostrophes
+    alphanumericQuery = alphanumericQuery.replace(/,/g, '').replace(/'/g, '');
+    if (!validator.isAlphanumeric(alphanumericQuery)) {
+        throw new Error("Invalid search query");
+    }
+    return sanitizedQuery;
 }
+
+
+
 
 
 function checkForRecipeSchema(resp) {
@@ -161,6 +175,8 @@ function scrapeRecipeData(resp) {
 
     let recipe = jsonRecipeSection[0];
 
+    let yield = formatYield(recipe.recipeYield);
+
     let data = {
         url: resp.config.url,
         name: recipe.name || '',
@@ -168,13 +184,47 @@ function scrapeRecipeData(resp) {
         prepTime: recipe.prepTime ? parseDuration(recipe.prepTime) : '',
         cookTime: recipe.cookTime ? parseDuration(recipe.cookTime) : '',
         totalTime: recipe.totalTime ? parseDuration(recipe.totalTime) : '',
-        recipeYield: recipe.recipeYield || '',
+        recipeYield: yield,
         recipeIngredient: recipe.recipeIngredient ? formatRecipeData(recipe.recipeIngredient) : [],
         recipeInstructions: recipe.recipeInstructions ? formatRecipeData(recipe.recipeInstructions) : []
     };
 
     return data;
 }
+
+function formatYield(yield) {
+    // Handle different types of 'yield' separately
+    if (Array.isArray(yield)) {
+        // If there are two elements in the array, return the second element
+        if (yield.length === 2) {
+            return yield[1].trim();
+        } 
+        // If there's only one element in the array, return that element
+        else if (yield.length === 1) {
+            return yield[0].trim();
+        }
+    } 
+    // If 'yield' is a number, convert it to a string and return it
+    else if (typeof yield === 'number') {
+        return yield.toString();
+    }
+    // If 'yield' is not an array or a number, return it as is
+    return yield;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 function formatRecipeData(data) {
     let formattedData = [];
@@ -184,7 +234,9 @@ function formatRecipeData(data) {
         // We choose 'text' as it's a common property for both 'HowToStep' and 'HowToSection' types
         if (typeof element === 'object') {
             if (element.text) {
-                formattedData.push(element.text);
+                let decoded = he.decode(element.text); // decode HTML entities
+                let noTags = striptags(decoded); // strip HTML tags
+                formattedData.push(noTags);
             } else if (element.itemListElement) {
                 // If the element is a 'HowToSection', recursively format its 'itemListElement'
                 formattedData = formattedData.concat(formatRecipeData(element.itemListElement));
@@ -192,12 +244,15 @@ function formatRecipeData(data) {
         }
         // If the element is a string, we can use it directly
         else if (typeof element === 'string') {
-            formattedData.push(element);
+            let decoded = he.decode(element); // decode HTML entities
+            let noTags = striptags(decoded); // strip HTML tags
+            formattedData.push(noTags);
         }
     });
 
     return formattedData;
 }
+
 
 
 // return the JSON object that contains a defined key value pair
@@ -239,13 +294,15 @@ Number.prototype.toHHMMSS = function () {
     var minutes = Math.floor(seconds / 60);
     seconds -= minutes * 60;
 
-    if (hours == 0) { return minutes + ' Minutes'; }
-    if ((hours == 1) && (minutes == 0)) { return hours + ' Hour' }
-    if (hours == 1) { return hours + ' Hour, ' + minutes + ' Minutes'; }
-    if ((hours != 0) && (minutes == 0)) { return hours + ' Hours' }
-    if (hours != 0) { return hours + ' Hours, ' + minutes + ' Minutes'; }
+    if (hours == 0 && minutes == 0) { return seconds + ' Seconds'; }
+    else if (hours == 0) { return minutes + ' Minutes'; }
+    else if ((hours == 1) && (minutes == 0)) { return hours + ' Hour'; }
+    else if (hours == 1) { return hours + ' Hour, ' + minutes + ' Minutes'; }
+    else if ((hours != 0) && (minutes == 0)) { return hours + ' Hours'; }
+    else if (hours != 0) { return hours + ' Hours, ' + minutes + ' Minutes'; }
     else { return; }
 }
+
 
 
 

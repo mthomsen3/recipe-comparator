@@ -1,9 +1,18 @@
+var pressTimer;
+
 window.addEventListener('load', function () {
-    const carouselSize = 2;
+    let carouselSize = 2;
     let currentCard = 0;
+    let sortableInstances = [];
 
     // Get all recipe cards
     const cards = document.querySelectorAll('.carousel-item');
+    const leftButton = document.getElementById('carousel-left');
+    const rightButton = document.getElementById('carousel-right');
+
+    // Get the carousel size buttons
+    const carouselSize1Button = document.getElementById('carousel-size-1');
+    const carouselSize2Button = document.getElementById('carousel-size-2');
 
     // Function to update the display of the cards
     function updateCarousel() {
@@ -11,7 +20,6 @@ window.addEventListener('load', function () {
         let maxHeight = 0;
         let visibleTitleCards = [];
 
-        // Reset heights of title cards
         cards.forEach((card) => {
             let titleCard = card.querySelector('.title-cards .card-body');
             titleCard.style.height = 'auto';
@@ -19,48 +27,82 @@ window.addEventListener('load', function () {
 
         cards.forEach((card, index) => {
             card.style.display = 'none';
+            card.classList.remove('carousel-item-size-1', 'carousel-item-size-2'); // remove both sizes first
+            card.classList.add(`carousel-item-size-${carouselSize}`); // then add the current size
+
+
+            // If there is a Sortable instance for this card, destroy it
+            if (sortableInstances[index]) {
+                sortableInstances[index].destroy();
+                sortableInstances[index] = null;
+            }
 
             // Show only the current card and the next one
             if (index >= currentCard && index < currentCard + carouselSize) {
                 card.style.display = 'block';
 
-                // Calculate the maximum ingredients for visible cards
                 let ingredientsList = card.querySelector('.ingredients ul');
-                maxIngredients = Math.max(maxIngredients, ingredientsList.children.length);
+                let currentIngredientsCount = ingredientsList.querySelectorAll('li:not(.empty)').length;
+                maxIngredients = Math.max(maxIngredients, currentIngredientsCount);
 
-                // Push visible title cards into an array
                 let titleCard = card.querySelector('.title-cards .card-body');
                 visibleTitleCards.push(titleCard);
+
+                // Create a new Sortable instance for this card
+                sortableInstances[index] = new Sortable(ingredientsList, {
+                    animation: 200,
+                    ghostClass: "sortable-ghost", // Class name for the drop placeholder
+                    chosenClass: "sortable-chosen", // Class name for the chosen item
+                    dragClass: "sortable-drag", // Class name for the dragging item
+                    onChoose: function (evt) {
+                        evt.item.classList.add('active'); // Change size when chosen
+                    },
+                    onUnchoose: function (evt) {
+                        evt.item.classList.remove('active'); // Revert size when dropped
+                    },
+                });
+
             }
         });
 
-        // Update the ingredients list
         updateIngredients(maxIngredients);
 
-        // Use setTimeout to wait for next repaint
         setTimeout(() => {
-            // Calculate the maximum height for visible title cards
             visibleTitleCards.forEach(titleCard => {
                 let titleCardHeight = titleCard.getBoundingClientRect().height;
                 maxHeight = Math.max(maxHeight, titleCardHeight);
             });
 
-            // Update visible title cards height
             updateTitleCards(maxHeight);
-
-            // Make ingredients list sortable
-            cards.forEach((card, index) => {
-                if (index >= currentCard && index < currentCard + carouselSize) {
-                    let ingredientsList = card.querySelector('.ingredients ul');
-                    new Sortable(ingredientsList, {
-                        animation: 200,
-                    });
-                }
-            });
         }, 0);
+
+        // Disable the left button if we are at the start of the carousel
+        leftButton.disabled = currentCard === 0;
+
+        // Disable the right button if we are at the end of the carousel
+        rightButton.disabled = currentCard === cards.length - carouselSize;
+
+        // Highlight the currently selected carousel size button
+        carouselSize1Button.className = 'carousel-size-button' + (carouselSize === 1 ? ' selected' : '');
+        carouselSize2Button.className = 'carousel-size-button' + (carouselSize === 2 ? ' selected' : '');
+        // Disable the button of the currently active size
+        document.getElementById(`carousel-size-${carouselSize}`).disabled = true;
+        // Enable the button of the other size
+        document.getElementById(`carousel-size-${carouselSize === 1 ? 2 : 1}`).disabled = false;
     }
 
+    // Add event listeners for the carousel size buttons
+    document.getElementById('carousel-size-1').addEventListener('click', function () {
+        carouselSize = 1;
+        currentCard = Math.min(currentCard, cards.length - carouselSize);
+        updateCarousel();
+    });
 
+    document.getElementById('carousel-size-2').addEventListener('click', function () {
+        carouselSize = 2;
+        currentCard = Math.min(currentCard, cards.length - carouselSize);
+        updateCarousel();
+    });
 
 
     // Function to update the ingredients list
@@ -71,7 +113,20 @@ window.addEventListener('load', function () {
 
             if (card) {
                 let ingredientsList = card.querySelector('.ingredients ul');
-                let currentIngredients = ingredientsList.children.length;
+                let elements = ingredientsList.children;
+
+                // Remove trailing 'empty' <li> elements
+                for (let j = elements.length - 1; j >= 0; j--) {
+                    if (elements[j].className === "empty") {
+                        elements[j].parentNode.removeChild(elements[j]);
+                    } else {
+                        // Stop at the first non-empty element
+                        break;
+                    }
+                }
+
+                // Recalculate the current ingredients after removal of empty elements
+                let currentIngredients = ingredientsList.querySelectorAll('li').length;
 
                 // Add empty <li> elements to each list up to the length of the longest list
                 while (currentIngredients < maxIngredients) {
@@ -83,6 +138,8 @@ window.addEventListener('load', function () {
             }
         }
     }
+
+
 
     // Function to update the height of title cards
     function updateTitleCards(maxHeight) {
@@ -101,13 +158,16 @@ window.addEventListener('load', function () {
     updateCarousel();
 
     // Add event listeners for the left and right buttons
-    document.getElementById('carousel-left').addEventListener('click', function () {
+    leftButton.addEventListener('click', function () {
         currentCard = Math.max(currentCard - 1, 0);
         updateCarousel();
     });
 
-    document.getElementById('carousel-right').addEventListener('click', function () {
+    rightButton.addEventListener('click', function () {
         currentCard = Math.min(currentCard + 1, cards.length - carouselSize);
         updateCarousel();
     });
+
+
+
 });

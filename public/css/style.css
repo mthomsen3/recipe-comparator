@@ -29,58 +29,95 @@ a {
   width: 50%;
 }
 
+.carousel-item-size-1 {
+  width: 100%;
+}
+
+.carousel-item-size-2 {
+  width: 50%;
+}
+
 #desktop-cards,
-#dropdown {
+#dropdown,
+#desktop-carousel-controls,
+.result-label-desktop {
   display: none;
 }
 
 #mobile-cards,
-#carousel-controls {
+#mobile-carousel-controls {
   display: flex;
 }
 
 @media (min-width: 40em) {
   #desktop-cards,
-  #dropdown {
+  #dropdown,
+  #desktop-carousel-controls,
+  .result-label-desktop {
     display: flex;
   }
+  #desktop-cards {
+    align-items: center;
+    justify-content: center;
+  }
   #mobile-cards,
-  #carousel-controls {
+  #mobile-carousel-controls {
     display: none;
   }
 }
-#carousel-controls {
+#mobile-carousel-controls,
+#desktop-carousel-controls {
   justify-content: center;
   align-items: center;
   margin-top: 0.5rem;
   margin-bottom: 1rem;
 }
 
-#carousel-controls button {
-  padding: 10px 20px;
-  margin: 0 10px;
-  border: 1px solid #A9A9A9;
+.carousel-size-button.selected {
   background-color: #A9A9A9;
-  border-radius: 1rem;
+}
+
+#mobile-carousel-controls button,
+#desktop-carousel-controls button {
+  padding: 5px;
+  margin: 5px;
+  border: 2px solid #565656;
+  background-color: #565656;
+  border-radius: 5px;
   color: #FCFCFC;
   font-size: 16px;
   cursor: pointer;
   transition: background-color 0.3s ease;
   box-shadow: 0 0 3px #A9A9A9;
 }
-#carousel-controls button img {
+#mobile-carousel-controls button img,
+#desktop-carousel-controls button img {
   width: 1.5rem;
   height: 1.5rem;
 }
 
-#carousel-controls button:hover {
+#mobile-carousel-controls button:hover:not(:disabled),
+#desktop-carousel-controls button:hover:not(:disabled) {
   background-color: hsl(233, 27%, 57%);
 }
 
-.result-label {
+#mobile-carousel-controls button:disabled,
+#desktop-carousel-controls button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.result-label,
+.result-label-desktop {
   text-align: center;
   padding: 0.3 rem;
   font-size: 1 rem;
+}
+
+.result-label-desktop {
+  display: flex;
+  justify-content: space-between;
 }
 
 #num-results-menu {
@@ -129,6 +166,10 @@ a {
   padding: 5rem;
 }
 
+.title-cards ul {
+  align-self: flex-start;
+}
+
 .col {
   flex: 1;
   margin: 0.5rem;
@@ -136,6 +177,8 @@ a {
   background: #EFEFEF;
   border-radius: 0.5rem;
   box-shadow: 0 0 4px #A9A9A9;
+  min-height: 150px;
+  align-items: center;
 }
 
 .ingredients ul {
@@ -160,8 +203,8 @@ a {
 }
 @media (max-width: 39.9375em) {
   .ingredients li {
-    height: 5rem;
-    min-height: 5rem;
+    height: 3rem;
+    min-height: 3rem;
   }
 }
 .ingredients li:hover {
@@ -169,6 +212,20 @@ a {
   height: auto;
   scale: 1.02;
   cursor: grab;
+}
+.ingredients li.active {
+  overflow: visible;
+  height: auto;
+  scale: 1.02;
+  cursor: grab;
+}
+
+.sortable-ghost,
+.sortable-chosen,
+.sortable-drag {
+  overflow: visible;
+  height: auto;
+  scale: 1.02;
 }
 
 .instructions ul {
@@ -331,13 +388,15 @@ a {
     padding: 0.1rem;
   }
 }
+.card-body {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  flex: 1;
+  margin-bottom: auto;
+}
 .card-body ul {
   list-style: none;
-}
-@media (max-width: 39.9375em) {
-  .card-body ul {
-    padding-left: 0.3rem;
-  }
 }
 .card-title {
   text-align: center;
@@ -356,6 +415,12 @@ a {
 }
 .title-cards ul {
   padding-bottom: 0.5rem;
+  padding-left: 10px;
+}
+@media (min-width: 40em) {
+  .title-cards ul {
+    padding-left: 20px;
+  }
 }
 
 .footer {
