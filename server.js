@@ -8,6 +8,22 @@ const app = express()
 const he = require('he');
 const striptags = require('striptags');
 const validator = require('validator');
+const nodemailer = require('nodemailer')
+const { google } = require('googleapis')
+const OAuth2 = google.auth.OAuth2
+
+
+const oauth2Client = new OAuth2(
+    process.env.Client_ID,
+    process.env.Client_Secret,
+    "https://developers.google.com/oauthplayground"
+)
+
+oauth2Client.setCredentials({
+    refresh_token: process.env.Refresh_Token
+})
+const accessToken = oauth2Client.getAccessToken()
+
 
 
 // view engine setup
@@ -15,6 +31,8 @@ app.set('views', 'views');
 app.set('view engine', 'ejs')
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json())
+
 
 // Validation of environment variables
 if (!process.env.apiKey || !process.env.searchEngineID) {
@@ -25,6 +43,109 @@ if (!process.env.apiKey || !process.env.searchEngineID) {
 app.listen(3000, function () {
     console.log('App listening on port 3000.')
 })
+
+// contact static page
+app.get('/contact', function (req, res) {
+    res.render('contact');
+});
+
+app.post('/contact', async (req, response) => {
+    const { name, email, content, 'g-recaptcha-response': recaptchaResponse } = req.body;
+
+    // Validate form fields
+    if (!name || name.length < 3 || name.length > 30) {
+        //response.status(400).json({ status: "error", message: "Name is required and must be between 3 and 30 characters." });
+        response.render('contact', { message: 'Name is required and must be between 3 and 30 characters.', type: 'error'  })
+        return;
+    }
+
+    if (!email || !validateEmail(email)) {
+        //response.status(400).json({ status: "error", message: "A valid email address is required." });
+        response.render('contact', { message: 'A valid email address is required.', type: 'error'  })
+        return;
+    }
+
+    if (!content) {
+        //response.status(400).json({ status: "error", message: "Message content is required." });
+        response.render('contact', { message: 'Message content is required.', type: 'error'  })
+        return;
+    }
+
+    try {
+        // Verify reCAPTCHA
+        const verifyURL = `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${recaptchaResponse}`;
+        const recaptchaResult = await axios.post(verifyURL);
+        console.log(recaptchaResult.data);
+
+        if (!recaptchaResult.data.success) {
+            response.render('contact', { message: 'reCAPTCHA verification failed.', type: 'error'  });
+            return;
+        }
+
+        // Sanitize inputs
+        const sanitized = {
+            name: sanitize(name),
+            email: sanitize(email),
+            content: sanitize(content),
+        }
+
+        const output = `
+      <p>You have a new contact request</p>
+      <h3>Contact details</h3>
+      <ul>
+        <li>Name: ${sanitized.name}</li>
+        <li>Email: ${sanitized.email}</li>
+        <li>Message: ${sanitized.content}</li>
+      </ul>`;
+
+        const smtpTrans = nodemailer.createTransport({
+            host: 'smtp.gmail.com',
+            port: 465,
+            secure: true,
+            auth: {
+                type: "OAuth2",
+                user: process.env.GMAIL_USER,
+                clientId: process.env.Client_ID,
+                clientSecret: process.env.Client_Secret,
+                refreshToken: process.env.Refresh_Token,
+                accessToken: accessToken
+            }
+        })
+
+        // verify connection configuration
+        smtpTrans.verify(function (error, success) {
+            if (error) {
+                console.log(error);
+            } else {
+                console.log("SMTP Connection Verified");
+            }
+        });
+
+
+        const mailOpts = {
+            from: process.env.GMAIL_USER,
+            to: process.env.RECIPIENT,
+            subject: 'New message from Nodemailer-contact-form',
+            html: output,
+        }
+
+        smtpTrans.sendMail(mailOpts, (error, res) => {
+            if (error) {
+                console.log(error);
+                response.render('contact', { message: 'An error occurred. Please try again later.', type: 'error'  })
+            }
+            else {
+                console.log("Message sent: " + res.message);
+                response.render('contact', { message: 'Your message was successfully sent!', type: 'success' });
+            }
+            smtpTrans.close();
+        })
+    } catch (error) {
+        console.log(error);
+        response.status(500).json({ status: "error", message: "An error occurred. Please try again later.", type: 'error'  });
+    }
+});
+
 
 app.get('/', function (req, res) {
     res.render('index', { recipeData: [], error: null });
@@ -37,11 +158,11 @@ app.post('/', async function (req, res, next) {
         validateInput(query);
 
         let searchResultUrls = await getSearchResults(query);
-        
+
         let recipeDisplay;
         try {
             recipeDisplay = await getRecipes(searchResultUrls);
-        } catch(err) {
+        } catch (err) {
             console.log(err);
             res.render('index', {
                 recipeData: [],
@@ -49,7 +170,7 @@ app.post('/', async function (req, res, next) {
             });
             return;
         }
-        
+
         res.render('index', {
             recipeData: recipeDisplay,
             error: null
@@ -58,6 +179,13 @@ app.post('/', async function (req, res, next) {
         next(err);
     }
 });
+
+// about static page
+app.get('/about', function (req, res) {
+    res.render('about');
+});
+
+
 
 // privacy policy static page
 app.get('/privacy-policy', function (req, res) {
@@ -76,13 +204,32 @@ app.use(function (req, res, next) {
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
     // Log the error, for now just console.log
     console.error(err);
     res.status(500).render('error', {
         message: 'Internal Server Error'
     });
 });
+
+
+// Helper function to validate email addresses
+function validateEmail(email) {
+    const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(String(email).toLowerCase());
+}
+
+// Helper function to sanitize user input
+function sanitize(input) {
+    const output = input.replace(/<[^>]*>/g, '').trim();
+    return output;
+}
+
+
+
+
+
+
 
 async function getSearchResults(query) {
     try {
@@ -99,13 +246,13 @@ async function getRecipes(searchResultUrls) {
     let recipeDisplay = [];
 
     for (let url of searchResultUrls) {
-        
+
         try {
             let response = await axios.get(url);
-            
+
             if (checkForRecipeSchema(response)) {
                 let recipeData = scrapeRecipeData(response);
-                if(recipeData) {
+                if (recipeData) {
                     recipeDisplay.push(recipeData);
                 } else {
                     console.log(`Scrape failed for URL ${url}`);
@@ -156,15 +303,15 @@ function findRecipeSection(resp) {
     const $ = cheerio.load(resp.data);
     var obj = $("script[type='application/ld+json']");
     var jsonRecipeSection = [];
-  
+
     for (var i = 0; i < obj.length; i++) {
         try {
             let json_schema = obj[i].children[0].data;
             let json_parsed = JSON.parse(json_schema);
             jsonRecipeSection = getObjects(json_parsed, '@type', 'Recipe');
-            
+
             // break the loop if a recipe section is found
-            if(jsonRecipeSection.length > 0) {
+            if (jsonRecipeSection.length > 0) {
                 break;
             }
         } catch (err) {
@@ -179,7 +326,7 @@ function findRecipeSection(resp) {
 function scrapeRecipeData(resp) {
     let jsonRecipeSection = findRecipeSection(resp);
 
-    if(jsonRecipeSection.length == 0) {
+    if (jsonRecipeSection.length == 0) {
         return null;
     }
 
@@ -208,12 +355,12 @@ function formatYield(yield) {
         // If there are two elements in the array, return the second element
         if (yield.length === 2) {
             return yield[1].trim();
-        } 
+        }
         // If there's only one element in the array, return that element
         else if (yield.length === 1) {
             return yield[0].trim();
         }
-    } 
+    }
     // If 'yield' is a number, convert it to a string and return it
     else if (typeof yield === 'number') {
         return yield.toString();

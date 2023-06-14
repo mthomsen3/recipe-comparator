@@ -363,7 +363,8 @@ a {
   }
 }
 .header__links a {
-  padding-right: 1rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
   text-decoration: none;
   position: relative;
   color: #565656;
@@ -448,12 +449,166 @@ a {
   padding-left: 0.1rem;
   padding-right: 0.1rem;
 }
-.footer__links.darkmode a {
-  color: #565656;
+.footer__links a:hover {
+  color: rgb(255, 183, 49);
+  transition: color 500ms ease-in-out;
 }
 .footer__copyright {
   padding-top: 0.5rem;
 }
-.footer__copyright.darkmode {
+
+legend {
+  font-size: 1.5rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+fieldset {
+  border: 0px solid #A9A9A9;
+  border-radius: 1rem;
+  padding-top: 1.7rem;
+  padding-left: 1.3rem;
+  padding-right: 1.3rem;
+  overflow: hidden;
+  color: #FCFCFC;
+  background-color: #e7e7e7;
+  box-shadow: 0 10px 10px hsla(0, 0%, 0%, 0.17);
+}
+
+.invalid-feedback {
+  position: relative;
+  top: -15px;
+  color: #FF3B3F;
+  padding-bottom: 1rem;
+}
+
+.contact {
+  width: 800px;
+  max-width: 800px;
+  background-color: #F5F5F5;
+  position: relative;
+  padding: 1rem;
+  padding-top: 1rem;
+}
+.contact h2 {
   color: #565656;
+  padding-bottom: 1rem;
+}
+.contact h4 {
+  text-align: center;
+}
+.contact .btn-group {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+.contact .g-recaptcha {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.contact-form-wrapper {
+  text-align: center;
+}
+@media (min-width: 40em) {
+  .contact-form-wrapper {
+    max-width: 50vw;
+    margin: auto;
+  }
+}
+.contact-form-wrapper .form-item {
+  position: relative;
+}
+.contact-form-wrapper label {
+  position: absolute;
+  top: 10px;
+  left: 2%;
+  color: #565656;
+  font-size: clamp(14px, 1.5vw, 18px);
+  pointer-events: none;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+  margin-top: 5px;
+}
+.contact-form-wrapper input,
+.contact-form-wrapper textarea {
+  box-sizing: border-box;
+  margin-right: auto;
+  width: 100%;
+  outline: 0;
+  border: 2px solid #A9A9A9;
+  border-radius: 4px;
+  margin-top: 5px;
+  margin-bottom: 20px;
+  padding: 12px;
+  font-size: clamp(15px, 1.5vw, 18px);
+  background-color: #FCFCFC;
+}
+.contact-form-wrapper textarea {
+  resize: vertical;
+  min-height: 200px;
+}
+.contact-form-wrapper input:focus + label,
+.contact-form-wrapper input:valid + label,
+.contact-form-wrapper textarea:focus + label,
+.contact-form-wrapper textarea:valid + label {
+  font-size: clamp(13px, 1.3vw, 16px);
+  color: #565656;
+  top: -20px;
+  transition: all 0.225s ease;
+}
+
+.form-submit {
+  justify-content: center;
+  align-items: center;
+}
+
+.form-submit {
+  padding: 1rem;
+  margin: 0.5rem;
+  border: 1px solid #A9A9A9;
+  background-color: #e7e7e7;
+  border-radius: 5px;
+  color: #565656;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  box-shadow: 0 0 3px #A9A9A9;
+}
+
+.form-submit:hover {
+  color: #FCFCFC;
+  background-color: #A9A9A9;
+}
+
+#message-box {
+  max-width: 800px;
+  margin: auto;
+  text-align: center;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  transition: opacity 2s; /* defines the duration of the fade-out effect */
+}
+#message-box.success {
+  color: #155724; /* Bootstrap success text color */
+  background-color: #d4edda; /* Bootstrap success background color */
+  border-color: #c3e6cb; /* Bootstrap success border color */
+}
+#message-box.error {
+  color: #721c24; /* Bootstrap danger text color */
+  background-color: #f8d7da; /* Bootstrap danger background color */
+  border-color: #f5c6cb; /* Bootstrap danger border color */
+}
+#message-box.blank {
+  color: inherit;
+  background-color: inherit;
+  border-color: inherit;
+}
+#message-box.fade {
+  opacity: 0;
 }/*# sourceMappingURL=style.css.map */

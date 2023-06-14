@@ -1,0 +1,54 @@
+<%- include('header') %>
+
+
+
+<div id="message-box" class="<%= typeof type !== 'undefined' ? type : 'blank' %>" style="display: <%= typeof message !== 'undefined' ? 'block' : 'none' %>;">
+  <% if(typeof message !=='undefined' ) { %>
+  <%= message %>
+  <% } %>
+</div>
+
+
+<div class="flex flex-jc-c flex-ai-c">
+
+  <div class="contact">
+    <div class="contact-form-wrapper flex-ai-c flex-jc-c">
+      <form method="POST" action="/contact" id="contact-form">
+        <!-- Insert the hidden input fields here, if necessary -->
+        <h2>Contact Form</h2>
+        <fieldset>
+          <legend class=""> </legend>
+          <div class="form-item">
+            <input type="text" name="name" id="name" class="" required>
+            <label for="name" class="">Name</label>
+            <!-- Insert error handling here, if necessary -->
+          </div>
+
+          <div class="form-item">
+            <input type="email" name="email" id="email" class="" required>
+            <label for="email" class="">Email</label>
+            <!-- Insert error handling here, if necessary -->
+          </div>
+
+          <div class="form-item">
+            <textarea name="content" id="content" class="" required></textarea>
+            <label for="content" class="">Message</label>
+            <!-- Insert error handling here, if necessary -->
+          </div>
+          <div class="form-item">
+            <div class="g-recaptcha" data-sitekey="6Lfq54olAAAAAAVZ43IgeFpWS8KtPq1yV749TLke"></div>
+            <!-- Replace YOUR_SITE_KEY with the actual site key -->
+          </div>
+        </fieldset>
+
+        <br>
+        <div class="">
+          <button type="submit" class="form-submit">Send Message</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+<script src="js/contact.js"></script>
+<%- include('footer') %>

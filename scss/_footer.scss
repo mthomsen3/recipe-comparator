@@ -14,6 +14,8 @@
 
     &__links {
         padding-top: 0.5rem;
+        
+
 
         a {
             color: $carbon; 
@@ -21,19 +23,15 @@
             padding-right: 0.1rem;
         }
 
-        &.darkmode {
-            a {
-                color: $blackboard;
-            }
+        a:hover {
+            color: $yorange;
+            transition: color 500ms ease-in-out;
         }
 
     }
 
     &__copyright {
         padding-top: 0.5rem;
-        &.darkmode {
-            color: $blackboard;
-        }
     }
 
 
