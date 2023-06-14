@@ -59,6 +59,16 @@ app.post('/', async function (req, res, next) {
     }
 });
 
+// privacy policy static page
+app.get('/privacy-policy', function (req, res) {
+    res.render('privacy-policy');
+});
+
+// terms of service static page
+app.get('/terms-of-service', function (req, res) {
+    res.render('terms-of-service');
+});
+
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

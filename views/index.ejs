@@ -1,44 +1,5 @@
-<!doctype html>
-<html lang="en">
-
-<head>
-  <!-- Required meta tags -->
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <!-- Custom CSS -->
-  <link rel="stylesheet" type="text/css" href="css/style.css">
-
-  <!-- Fonts -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Monoton&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@900&display=swap" rel="stylesheet">
-  <!-- Javascript -->
-  <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
-
-
-  <title>Recipe Comparator</title>
-
-</head>
-
-<body>
-
-  <header class="header">
-    <div class="overlay has-fade"></div>
-    <nav class="flex flex-jc-sb flex-ai-c container">
-      <a href="/" class="header__logo">
-        <p>The Recipe Comparator</p>
-        <!-- <img src="images/logo.png" alt="Logo Image"> -->
-      </a>
-
-      <div class="header__links flex flex-jc-sb flex-ai-c">
-        <a href="#">Home</a>
-        <a href="#">About</a>
-      </div>
-    </nav>
-  </header>
-
+<%- include('header') %>
+<main id="main-content">
   <div class="flex flex-jc-c flex-ai-c">
     <div class="wrap">
       <div class="search">
@@ -69,219 +30,201 @@
 
 
   <% var rl=[]; %>
-    <% for(let i=0; i < 3; i++) { %>
-      <% if(recipeData[i] !==null && recipeData[i] !=undefined){rl[i]=recipeData[i].recipeIngredient.length;} %>
+  <% for(let i=0; i < 3; i++) { %>
+  <% if(recipeData[i] !==null && recipeData[i] !=undefined){rl[i]=recipeData[i].recipeIngredient.length;} %>
+  <% } %>
+  <% var max=Math.max(...rl); %>
+  <input type="hidden" id="numRecipes" value="<%= recipeData.length %>">
+  <div class="flex flex-jc-c flex-ai-c" id="desktop-carousel-controls">
+    <button id="desktop-carousel-left" disabled><img src="images/left-arrow.svg" alt="left arrow"></button>
+    <button id="desktop-carousel-right" disabled><img src="images/right-arrow.svg" alt="right arrow"></button>
+  </div>
+
+  <div id="desktop-cards">
+    <div class="container">
+
+      <div class="row title-cards flex flex-row flex-jc-c">
+        <% recipeData.forEach((recipe, i)=> { %>
+        <% if(recipe !==null && recipe !=undefined){ %>
+        <div class="col card" id="title-cards-<%= i %>">
+          <div class="card-body">
+            <h4 class="card-title">
+              <a href="<%- recipe.url %>">
+                <%- recipe.name %>
+              </a>
+            </h4>
+            <ul>
+              <li><b>Prep Time:</b> <%- recipe.prepTime %></li>
+              <li><b>Cook Time:</b> <%- recipe.cookTime %></li>
+              <li><b>Total Time:</b> <%- recipe.totalTime %></li>
+              <li><b>Yield:</b> <%- recipe.recipeYield %></li>
+            </ul>
+          </div>
+        </div>
         <% } %>
-          <% var max=Math.max(...rl); %>
-            <input type="hidden" id="numRecipes" value="<%= recipeData.length %>">
-            <div class="flex flex-jc-c flex-ai-c" id="desktop-carousel-controls">
-              <button id="desktop-carousel-left" disabled><img src="images/left-arrow.svg" alt="left arrow"></button>
-              <button id="desktop-carousel-right" disabled><img src="images/right-arrow.svg" alt="right arrow"></button>
+        <% }); %>
+      </div>
+
+
+      <div class="row ingredients flex flex-row flex-jc-c">
+        <% recipeData.forEach((recipe, i)=> { %>
+        <div class="col" id="ingredients-<%= i %>">
+          <% if(recipe !==null && recipe !=undefined){ %>
+          <div class="card">
+            <h4 class="card-title"> Ingredients </h4>
+            <ul id="list-<%= i + 1 %>">
+              <% recipe.recipeIngredient.forEach(ingredient=> { %>
+              <li>
+                <%= ingredient %>
+              </li>
+              <% }); %>
+            </ul>
+          </div>
+          <% } %>
+        </div>
+        <% }); %>
+      </div>
+
+      <div class="row description flex flex-row flex-jc-c">
+        <% recipeData.forEach((recipe, i)=> { %>
+        <div class="col" id="description-<%= i %>">
+          <% if(recipe !==null && recipe !=undefined){ %>
+          <div class="card">
+            <h4 class="card-title"> Description </h4>
+            <p class="card-text">
+              <%- recipe.description %>
+            </p>
+            <div class="card-footer">
+              <small><a href="<%- recipe.url %>">Link to Original</a></small>
             </div>
-
-            <div id="desktop-cards">
-              <div class="container">
-
-                <div class="row title-cards flex flex-row flex-jc-c">
-                  <% recipeData.forEach((recipe, i)=> { %>
-                    <% if(recipe !==null && recipe !=undefined){ %>
-                      <div class="col card" id="title-cards-<%= i %>">
-                        <div class="card-body">
-                          <h4 class="card-title">
-                            <a href="<%- recipe.url %>">
-                              <%- recipe.name %>
-                            </a>
-                          </h4>
-                          <ul>
-                            <li><b>Prep Time:</b> <%- recipe.prepTime %></li>
-                            <li><b>Cook Time:</b> <%- recipe.cookTime %></li>
-                            <li><b>Total Time:</b> <%- recipe.totalTime %></li>
-                            <li><b>Yield:</b> <%- recipe.recipeYield %></li>
-                          </ul>
-                        </div>
-                      </div>
-                      <% } %>
-                        <% }); %>
-                </div>
+          </div>
+          <% } %>
+        </div>
+        <% }); %>
+      </div>
 
 
-                <div class="row ingredients flex flex-row flex-jc-c">
-                  <% recipeData.forEach((recipe, i)=> { %>
-                    <div class="col" id="ingredients-<%= i %>">
-                      <% if(recipe !==null && recipe !=undefined){ %>
-                        <div class="card">
-                          <h4 class="card-title"> Ingredients </h4>
-                          <ul id="list-<%= i + 1 %>">
-                            <% recipe.recipeIngredient.forEach(ingredient=> { %>
-                              <li>
-                                <%= ingredient %>
-                              </li>
-                              <% }); %>
-                          </ul>
-                        </div>
-                        <% } %>
-                    </div>
-                    <% }); %>
-                </div>
+      <div class="row instructions flex flex-row flex-jc-c">
+        <% recipeData.forEach((recipe, i)=> { %>
+        <div class="col" id="instructions-<%= i %>">
+          <% if(recipe !==null && recipe !=undefined){ %>
+          <div class="card">
+            <h4 class="card-title"> Instructions </h4>
+            <ul id="list-<%= i + 1 %>">
+              <% recipe.recipeInstructions.forEach(instruction=> { %>
+              <li>
+                <%= instruction %>
+              </li>
+              <% }); %>
+            </ul>
+          </div>
+          <% } %>
+        </div>
+        <% }); %>
+      </div>
+    </div>
+  </div>
+  <!-- Carousel controls -->
+  <div id="mobile-carousel-controls">
+    <button id="carousel-left">
+      <img src="images/left-arrow.svg" alt="left arrow">
+    </button>
+    <div id="carousel-size-controls">
+      <button id="carousel-size-1" class="carousel-size-button">
+        <img src="images/single.svg" alt="show 1">
+      </button>
+      <button id="carousel-size-2" class="carousel-size-button">
+        <img src="images/double.svg" alt="show 2">
+      </button>
+    </div>
 
-                <div class="row description flex flex-row flex-jc-c">
-                  <% recipeData.forEach((recipe, i)=> { %>
-                    <div class="col" id="description-<%= i %>">
-                      <% if(recipe !==null && recipe !=undefined){ %>
-                        <div class="card">
-                          <h4 class="card-title"> Description </h4>
-                          <p class="card-text">
-                            <%- recipe.description %>
-                          </p>
-                          <div class="card-footer">
-                            <small><a href="<%- recipe.url %>">Link to Original</a></small>
-                          </div>
-                        </div>
-                        <% } %>
-                    </div>
-                    <% }); %>
-                </div>
-
-
-                <div class="row instructions flex flex-row flex-jc-c">
-                  <% recipeData.forEach((recipe, i)=> { %>
-                    <div class="col" id="instructions-<%= i %>">
-                      <% if(recipe !==null && recipe !=undefined){ %>
-                        <div class="card">
-                          <h4 class="card-title"> Instructions </h4>
-                          <ul id="list-<%= i + 1 %>">
-                            <% recipe.recipeInstructions.forEach(instruction=> { %>
-                              <li>
-                                <%= instruction %>
-                              </li>
-                              <% }); %>
-                          </ul>
-                        </div>
-                        <% } %>
-                    </div>
-                    <% }); %>
-                </div>
-              </div>
+    <button id="carousel-right">
+      <img src="images/right-arrow.svg" alt="right arrow">
+    </button>
+  </div>
+  <div class="container">
+    <div id="mobile-cards" class="carousel">
+      <% recipeData.forEach((recipe, i)=> { %>
+      <% if(recipe !==null && recipe !=undefined){ %>
+      <div class="carousel-item" id="carousel-item-<%= i %>">
+        <!-- Add a result label at the top of each card -->
+        <div class="result-label">
+          <h2>Result <%= i + 1 %>
+          </h2>
+        </div>
+        <!-- Title -->
+        <div class="row title-cards flex flex-row flex-jc-c">
+          <div class="col card">
+            <div class="card-body">
+              <h4 class="card-title">
+                <a href="<%- recipe.url %>">
+                  <%- recipe.name %>
+                </a>
+              </h4>
+              <ul>
+                <li><b>Prep Time:</b> <%- recipe.prepTime %></li>
+                <li><b>Cook Time:</b> <%- recipe.cookTime %></li>
+                <li><b>Total Time:</b> <%- recipe.totalTime %></li>
+                <li><b>Yield:</b> <%- recipe.recipeYield %></li>
+              </ul>
             </div>
-            <!-- Carousel controls -->
-            <div id="mobile-carousel-controls">
-              <button id="carousel-left">
-                <img src="images/left-arrow.svg" alt="left arrow">
-              </button>
-              <div id="carousel-size-controls">
-                <button id="carousel-size-1" class="carousel-size-button">
-                  <img src="images/single.svg" alt="show 1">
-                </button>
-                <button id="carousel-size-2" class="carousel-size-button">
-                  <img src="images/double.svg" alt="show 2">
-                </button>
-              </div>
+          </div>
+        </div>
 
-              <button id="carousel-right">
-                <img src="images/right-arrow.svg" alt="right arrow">
-              </button>
+        <!-- Ingredients -->
+        <div class="row ingredients flex flex-row flex-jc-c">
+          <div class="col card">
+            <h4 class="card-title"> Ingredients </h4>
+            <ul id="list-<%= i + 1 %>">
+              <% recipe.recipeIngredient.forEach(ingredient=> { %>
+              <li>
+                <%= ingredient %>
+              </li>
+              <% }); %>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="row description flex flex-row flex-jc-c">
+          <div class="col card">
+            <h4 class="card-title"> Description </h4>
+            <p class="card-text">
+              <%- recipe.description %>
+            </p>
+            <div class="card-footer">
+              <small><a href="<%- recipe.url %>">Link to Original</a></small>
             </div>
-            <div class="container">
-              <div id="mobile-cards" class="carousel">
-                <% recipeData.forEach((recipe, i)=> { %>
-                  <% if(recipe !==null && recipe !=undefined){ %>
-                    <div class="carousel-item" id="carousel-item-<%= i %>">
-                      <!-- Add a result label at the top of each card -->
-                      <div class="result-label">
-                        <h2>Result <%= i + 1 %>
-                        </h2>
-                      </div>
-                      <!-- Title -->
-                      <div class="row title-cards flex flex-row flex-jc-c">
-                        <div class="col card">
-                          <div class="card-body">
-                            <h4 class="card-title">
-                              <a href="<%- recipe.url %>">
-                                <%- recipe.name %>
-                              </a>
-                            </h4>
-                            <ul>
-                              <li><b>Prep Time:</b> <%- recipe.prepTime %></li>
-                              <li><b>Cook Time:</b> <%- recipe.cookTime %></li>
-                              <li><b>Total Time:</b> <%- recipe.totalTime %></li>
-                              <li><b>Yield:</b> <%- recipe.recipeYield %></li>
-                            </ul>
-                          </div>
-                        </div>
-                      </div>
+          </div>
+        </div>
 
-                      <!-- Ingredients -->
-                      <div class="row ingredients flex flex-row flex-jc-c">
-                        <div class="col card">
-                          <h4 class="card-title"> Ingredients </h4>
-                          <ul id="list-<%= i + 1 %>">
-                            <% recipe.recipeIngredient.forEach(ingredient=> { %>
-                              <li>
-                                <%= ingredient %>
-                              </li>
-                              <% }); %>
-                          </ul>
-                        </div>
-                      </div>
+        <!-- Instructions -->
+        <div class="row instructions flex flex-row flex-jc-c">
+          <div class="col card">
+            <h4 class="card-title"> Instructions </h4>
+            <ul id="list-<%= i + 1 %>">
+              <% recipe.recipeInstructions.forEach(instruction=> { %>
+              <li>
+                <%= instruction %>
+              </li>
+              <% }); %>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <% } %>
+      <% }); %>
+    </div>
+  </div>
 
-                      <!-- Description -->
-                      <div class="row description flex flex-row flex-jc-c">
-                        <div class="col card">
-                          <h4 class="card-title"> Description </h4>
-                          <p class="card-text">
-                            <%- recipe.description %>
-                          </p>
-                          <div class="card-footer">
-                            <small><a href="<%- recipe.url %>">Link to Original</a></small>
-                          </div>
-                        </div>
-                      </div>
+  <div class="hints">
+    <p id="search-hint"><i class="fa-solid fa-circle-info"></i>Not getting many results? Try adding the word
+      "recipe" to
+      the end of your query.</p>
+    <p id="search-hint"><i class="fa-solid fa-circle-info"></i>Click and drag to rearrange the indredient
+      lists for
+      side-by-side comparison.</p>
+  </div>
 
-                      <!-- Instructions -->
-                      <div class="row instructions flex flex-row flex-jc-c">
-                        <div class="col card">
-                          <h4 class="card-title"> Instructions </h4>
-                          <ul id="list-<%= i + 1 %>">
-                            <% recipe.recipeInstructions.forEach(instruction=> { %>
-                              <li>
-                                <%= instruction %>
-                              </li>
-                              <% }); %>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                    <% } %>
-                      <% }); %>
-              </div>
-            </div>
-
-            <div class="hints">
-              <p id="search-hint"><i class="fa-solid fa-circle-info"></i>Not getting many results? Try adding the word
-                "recipe" to
-                the end of your query.</p>
-              <p id="search-hint"><i class="fa-solid fa-circle-info"></i>Click and drag to rearrange the indredient
-                lists for
-                side-by-side comparison.</p>
-            </div>
-            <div class="footer">
-
-              <div class="footer__links">
-
-                <a href="#">Privacy Policy</a>
-                <a href="#">Contact</a>
-                <a href="#">Terms of Service</a>
-              </div>
-
-              <div class="footer__copyright has-darkmode darkmode">
-                &copy; CS27 All Rights Reserved.
-              </div>
-
-            </div>
-            <script src="js/script.js"></script>
-            <script src="js/carousel.js"></script>
-
-</body>
-
-
-</html>
+</main>
+<%- include('footer') %>

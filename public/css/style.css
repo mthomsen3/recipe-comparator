@@ -423,6 +423,11 @@ a {
   }
 }
 
+.policy-box {
+  max-width: 800px;
+  padding: 1rem;
+}
+
 .footer {
   position: relative;
   height: 70px;
